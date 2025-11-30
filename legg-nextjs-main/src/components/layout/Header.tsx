@@ -81,7 +81,7 @@ export function Header({
       {/* Left: Title */}
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-bold text-text whitespace-nowrap">
-          LEGG Production Schedule
+          LEGG Production Schedule - DEV TEST 
         </h1>
 
         {/* Week Stats */}
