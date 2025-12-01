@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, daySettings } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+
+const normalizeDayId = (value: string) => {
+  try {
+    const d = new Date(value);
+    // Force to YYYY-MM-DD to avoid timezone drift
+    return d.toISOString().slice(0, 10);
+  } catch {
+    return value;
+  }
+};
 
 // GET /api/day-settings - Get all day settings
 export async function GET() {
@@ -8,7 +19,7 @@ export async function GET() {
     return NextResponse.json(allSettings);
   } catch (error) {
     console.error('Error fetching day settings:', error);
-    return NextResponse.json({ error: 'Failed to fetch day settings' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch day settings', details: `${error}` }, { status: 500 });
   }
 }
 
@@ -23,11 +34,24 @@ export async function PUT(request: NextRequest) {
       dayNote?: string;
     }[];
 
+    console.log('[day-settings] incoming', JSON.stringify(settings, null, 2));
+
+    const results = [];
+
     for (const setting of settings) {
+      const dayId = normalizeDayId(setting.dayId);
+
+      console.log('[day-settings] upsert', {
+        dayId,
+        capacityOverride: setting.capacityOverride,
+        isFridayLocked: setting.isFridayLocked,
+        dayNote: setting.dayNote,
+      });
+
       await db
         .insert(daySettings)
         .values({
-          dayId: setting.dayId,
+          dayId,
           capacityOverride: setting.capacityOverride ?? null,
           isFridayLocked: setting.isFridayLocked ?? null,
           dayNote: setting.dayNote ?? '',
@@ -40,11 +64,22 @@ export async function PUT(request: NextRequest) {
             dayNote: setting.dayNote ?? '',
           },
         });
+
+      const fresh = await db
+        .select()
+        .from(daySettings)
+        .where(eq(daySettings.dayId, dayId));
+
+      console.log('[day-settings] saved row', fresh);
+      results.push(fresh[0] ?? null);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, rows: results });
   } catch (error) {
     console.error('Error updating day settings:', error);
-    return NextResponse.json({ error: 'Failed to update day settings' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update day settings', details: `${error}` },
+      { status: 500 }
+    );
   }
 }
