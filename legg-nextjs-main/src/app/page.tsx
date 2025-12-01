@@ -14,12 +14,10 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSchedule } from '@/hooks/useSchedule';
 import { startOfThisWeekMonday, addDays } from '@/lib/utils/dates';
-import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const [startMonday, setStartMonday] = useState(() => startOfThisWeekMonday());
   const [isHydrated, setIsHydrated] = useState(false);
-  const router = useRouter();
 
   const fetchJobs = useJobStore((state) => state.fetchJobs);
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
@@ -36,13 +34,15 @@ export default function HomePage() {
     fetchDaySettings();
   }, [fetchJobs, fetchSettings, fetchDaySettings]);
 
-  // Auto-refresh the app every 10 seconds
+  // Auto-refresh data every 10 seconds
   useEffect(() => {
     const id = setInterval(() => {
-      router.refresh();
+      fetchJobs();
+      fetchSettings();
+      fetchDaySettings();
     }, 10000);
     return () => clearInterval(id);
-  }, [router]);
+  }, [fetchJobs, fetchSettings, fetchDaySettings]);
 
   // Navigation handlers
   const handlePrevWeek = () => {

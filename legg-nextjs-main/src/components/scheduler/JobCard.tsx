@@ -96,7 +96,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
           className={clsx(
             'truncate',
             textStyles.note,
-            isFullScreen && 'text-lg font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] uppercase'
+            isFullScreen && 'text-2xl font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] uppercase'
           )}
           style={{
             color: '#ff3b6b',

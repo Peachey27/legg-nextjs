@@ -100,7 +100,7 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
             </div>
             <div className="text-[10px] text-accent mb-1">{entry.dayLabel}</div>
             <div
-              className="text-sm font-bold leading-relaxed uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]"
+              className="text-2xl font-bold leading-relaxed uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]"
               style={{ color: '#ff3b6b' }}
             >
               {entry.note.toUpperCase()}
