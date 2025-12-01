@@ -1,9 +1,11 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { DayColumn } from './DayColumn';
 import { startOfToday, getPreviousFriday, toISODateString } from '@/lib/utils/dates';
+import { useJobStore } from '@/stores/jobStore';
+import { useUIStore } from '@/stores/uiStore';
 import type { Day, ScheduleByDay } from '@/types';
 
 interface SchedulerGridProps {
@@ -14,6 +16,8 @@ interface SchedulerGridProps {
 
 export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const jobs = useJobStore((state) => state.jobs);
+  const activeView = useUIStore((state) => state.activeView);
   const handleAutoScrollDragOver = useCallback((e: React.DragEvent) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -31,6 +35,35 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
       container.scrollLeft += speed;
     }
   }, []);
+
+  // Compute per-segment extra fractions so only the tail (extra hours) is striped.
+  const extraFractionsByDay = useMemo(() => {
+    const map: Record<string, Record<string, number>> = {};
+    const remaining: Record<string, { base: number; extra: number }> = {};
+
+    jobs.forEach((j) => {
+      const base = activeView === 'cut' ? j.cutHours : j.totalHours;
+      const extra = activeView === 'cut' ? j.extraCutHours ?? 0 : j.extraHours ?? 0;
+      remaining[j.id] = { base: base ?? 0, extra: extra ?? 0 };
+    });
+
+    days.forEach((day) => {
+      const segs = scheduleByDay[day.id] || [];
+      segs.forEach((seg) => {
+        const rem = remaining[seg.jobId];
+        if (!rem) return;
+        const baseUse = Math.min(rem.base, seg.hours);
+        const extraInSeg = Math.max(0, seg.hours - baseUse);
+        rem.base = Math.max(0, rem.base - baseUse);
+        rem.extra = Math.max(0, rem.extra - extraInSeg);
+        const fraction = seg.hours > 0 ? extraInSeg / seg.hours : 0;
+        if (!map[day.id]) map[day.id] = {};
+        map[day.id][seg.jobId] = fraction;
+      });
+    });
+
+    return map;
+  }, [activeView, days, jobs, scheduleByDay]);
 
   // Auto-scroll to previous Friday or today on mount
   useEffect(() => {
@@ -82,6 +115,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
             day={day}
             segments={scheduleByDay[day.id] || []}
             isFullScreen={isFullScreen}
+            extraFractions={extraFractionsByDay[day.id]}
           />
         ))}
       </div>

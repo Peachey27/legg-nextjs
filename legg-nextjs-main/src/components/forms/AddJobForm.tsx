@@ -42,7 +42,9 @@ export function AddJobForm() {
       title: title.trim(),
       vquote: vquote.trim(),
       totalHours: hours,
+      extraHours: 0,
       cutHours: cut,
+      extraCutHours: 0,
       type: jobType,
       color,
       note: note.trim(),
@@ -116,7 +118,7 @@ export function AddJobForm() {
           onChange={(e) => setTotalHours(e.target.value)}
           placeholder="0"
           min="0"
-          step="0.5"
+          step="0.25"
         />
         <Input
           label="Cut Hours"
@@ -125,7 +127,7 @@ export function AddJobForm() {
           onChange={(e) => setCutHours(e.target.value)}
           placeholder="0"
           min="0"
-          step="0.5"
+          step="0.25"
         />
       </div>
 

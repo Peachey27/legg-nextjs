@@ -8,14 +8,16 @@ interface ScheduleParams extends AppSettings {
 
 export function getViewFields(job: Job, view: ViewMode) {
   if (view === 'cut') {
+    const extra = job.extraCutHours ?? 0;
     return {
-      hours: job.cutHours ?? 0,
+      hours: (job.cutHours ?? 0) + extra,
       startDayId: job.cutStartDayId ?? null,
       order: job.cutOrder ?? job.order,
     };
   }
+  const extra = job.extraHours ?? 0;
   return {
-    hours: job.totalHours,
+    hours: job.totalHours + extra,
     startDayId: job.startDayId,
     order: job.order,
   };

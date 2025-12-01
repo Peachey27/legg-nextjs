@@ -19,7 +19,9 @@ export async function GET(
     return NextResponse.json({
       ...job,
       totalHours: parseFloat(job.totalHours),
+      extraHours: parseFloat(job.extraHours),
       cutHours: parseFloat(job.cutHours),
+      extraCutHours: parseFloat(job.extraCutHours),
     });
   } catch (error) {
     console.error('Error fetching job:', error);
@@ -44,6 +46,8 @@ export async function PUT(
     if (body.vquote !== undefined) updates.vquote = body.vquote;
     if (body.totalHours !== undefined) updates.totalHours = body.totalHours.toString();
     if (body.cutHours !== undefined) updates.cutHours = body.cutHours.toString();
+    if (body.extraHours !== undefined) updates.extraHours = body.extraHours.toString();
+    if (body.extraCutHours !== undefined) updates.extraCutHours = body.extraCutHours.toString();
     if (body.type !== undefined) updates.type = body.type;
     if (body.color !== undefined) updates.color = body.color;
     if (body.note !== undefined) updates.note = body.note;
@@ -65,7 +69,9 @@ export async function PUT(
     return NextResponse.json({
       ...job,
       totalHours: parseFloat(job.totalHours),
+      extraHours: parseFloat(job.extraHours),
       cutHours: parseFloat(job.cutHours),
+      extraCutHours: parseFloat(job.extraCutHours),
     });
   } catch (error) {
     console.error('Error updating job:', error);

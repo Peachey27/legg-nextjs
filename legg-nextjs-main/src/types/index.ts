@@ -5,7 +5,9 @@ export interface Job {
   title: string;
   vquote: string;
   totalHours: number;
+  extraHours?: number;
   cutHours: number;
+  extraCutHours?: number;
   type: JobType;
   color: string;
   note: string;

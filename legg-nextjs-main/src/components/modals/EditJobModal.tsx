@@ -19,7 +19,9 @@ export function EditJobModal() {
   const [title, setTitle] = useState('');
   const [vquote, setVquote] = useState('');
   const [totalHours, setTotalHours] = useState('');
+  const [extraHours, setExtraHours] = useState('');
   const [cutHours, setCutHours] = useState('');
+  const [extraCutHours, setExtraCutHours] = useState('');
   const [jobType, setJobType] = useState<JobType>('windows');
   const [color, setColor] = useState('#ff6fae');
   const [note, setNote] = useState('');
@@ -30,7 +32,9 @@ export function EditJobModal() {
       setTitle(job.title);
       setVquote(job.vquote);
       setTotalHours(job.totalHours.toString());
+      setExtraHours((job.extraHours ?? 0).toString());
       setCutHours(job.cutHours.toString());
+      setExtraCutHours((job.extraCutHours ?? 0).toString());
       setJobType(job.type);
       setColor(job.color);
       setNote(job.note);
@@ -44,7 +48,9 @@ export function EditJobModal() {
       title: title.trim(),
       vquote: vquote.trim(),
       totalHours: Number(totalHours) || 0,
+      extraHours: Number(extraHours) || 0,
       cutHours: Number(cutHours) || 0,
+      extraCutHours: Number(extraCutHours) || 0,
       type: jobType,
       color,
       note: note.trim(),
@@ -86,7 +92,15 @@ export function EditJobModal() {
             value={totalHours}
             onChange={(e) => setTotalHours(e.target.value)}
             min="0"
-            step="0.5"
+            step="0.25"
+          />
+          <Input
+            label="Extra Fab Hours"
+            type="number"
+            value={extraHours}
+            onChange={(e) => setExtraHours(e.target.value)}
+            min="0"
+            step="0.25"
           />
           <Input
             label="Cut Hours"
@@ -94,7 +108,15 @@ export function EditJobModal() {
             value={cutHours}
             onChange={(e) => setCutHours(e.target.value)}
             min="0"
-            step="0.5"
+            step="0.25"
+          />
+          <Input
+            label="Extra Cut Hours"
+            type="number"
+            value={extraCutHours}
+            onChange={(e) => setExtraCutHours(e.target.value)}
+            min="0"
+            step="0.25"
           />
         </div>
 

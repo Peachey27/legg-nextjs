@@ -15,9 +15,10 @@ interface DayColumnProps {
   day: Day;
   segments: JobSegment[];
   isFullScreen?: boolean;
+  extraFractions?: Record<string, number>;
 }
 
-export function DayColumn({ day, segments, isFullScreen }: DayColumnProps) {
+export function DayColumn({ day, segments, isFullScreen, extraFractions }: DayColumnProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { handleDropToDay, handleDragOver } = useDragDrop();
   const { openCapEdit, activeView } = useUIStore();
@@ -133,22 +134,24 @@ export function DayColumn({ day, segments, isFullScreen }: DayColumnProps) {
         )}
 
         {/* Job cards */}
-        {segments.map((segment) => {
-          const job = jobs.find((j) => j.id === segment.jobId);
-          if (!job) return null;
+      {segments.map((segment) => {
+        const job = jobs.find((j) => j.id === segment.jobId);
+        if (!job) return null;
 
-          const heightPercent = capacity > 0 ? (segment.hours / capacity) * 100 : 0;
+        const heightPercent = capacity > 0 ? (segment.hours / capacity) * 100 : 0;
+        const extraFraction = extraFractions?.[segment.jobId] ?? 0;
 
-          return (
-            <JobCard
-              key={segment.jobId}
-              job={job}
-              hours={segment.hours}
-              heightPercent={heightPercent}
-              isCutView={activeView === 'cut'}
-            />
-          );
-        })}
+        return (
+          <JobCard
+            key={segment.jobId}
+            job={job}
+            hours={segment.hours}
+            heightPercent={heightPercent}
+            isCutView={activeView === 'cut'}
+            extraFraction={extraFraction}
+          />
+        );
+      })}
 
         {/* Remaining capacity spacer */}
         {capacity > usedHours && (

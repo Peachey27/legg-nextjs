@@ -11,7 +11,9 @@ export async function GET() {
     const formattedJobs = allJobs.map(job => ({
       ...job,
       totalHours: parseFloat(job.totalHours),
+      extraHours: parseFloat(job.extraHours),
       cutHours: parseFloat(job.cutHours),
+      extraCutHours: parseFloat(job.extraCutHours),
     }));
 
     return NextResponse.json(formattedJobs);
@@ -30,7 +32,9 @@ export async function POST(request: NextRequest) {
       title: body.title,
       vquote: body.vquote || '',
       totalHours: body.totalHours?.toString() || '0',
+      extraHours: body.extraHours?.toString() || '0',
       cutHours: body.cutHours?.toString() || '0',
+      extraCutHours: body.extraCutHours?.toString() || '0',
       type: body.type || 'windows',
       color: body.color || '#ff6fae',
       note: body.note || '',
@@ -44,7 +48,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ...job,
       totalHours: parseFloat(job.totalHours),
+      extraHours: parseFloat(job.extraHours),
       cutHours: parseFloat(job.cutHours),
+      extraCutHours: parseFloat(job.extraCutHours),
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating job:', error);

@@ -11,15 +11,18 @@ interface JobCardProps {
   hours: number;
   heightPercent?: number;
   isCutView?: boolean;
+  extraFraction?: number;
 }
 
-export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardProps) {
+export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFraction = 0 }: JobCardProps) {
   const { handleDragStart } = useDragDrop();
   const { openEditJob, setCopiedJob } = useUIStore();
   const isFullScreen = useUIStore((state) => state.isFullScreen);
 
   const totalHours = isCutView ? job.cutHours : job.totalHours;
-  const isPartial = hours < totalHours;
+  const extraHours = isCutView ? job.extraCutHours ?? 0 : job.extraHours ?? 0;
+  const combinedHours = totalHours + extraHours;
+  const isPartial = hours < combinedHours;
 
   // Determine text size based on height
   const textSize = heightPercent > 50 ? 'big' : heightPercent > 25 ? 'medium' : heightPercent > 12 ? 'small' : 'tiny';
@@ -63,7 +66,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
       onDoubleClick={() => openEditJob(job.id)}
     >
       {/* Large center title label (hidden for very short jobs) */}
-      {hours > 3 && (
+      {combinedHours > 3 && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
           <div className="text-2xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words">
             {job.type === 'screens' && job.note ? job.note : job.title}
@@ -80,7 +83,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
       <div className={clsx('flex items-center gap-1 flex-wrap', textStyles.sub)}>
         {job.vquote && <VQPill vquote={job.vquote} />}
         <span className={clsx(isPartial && 'text-yellow-600')}>
-          {isPartial ? `${hours.toFixed(1)}/${totalHours}h` : `${totalHours}h`}
+          {isPartial ? `${hours.toFixed(1)}/${combinedHours}h` : `${combinedHours}h`}
         </span>
         {job.type === 'screens' && (
           <span className="bg-job-lime/30 px-1 rounded text-job-lime">screens</span>
@@ -102,6 +105,20 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
         >
           {job.note}
         </div>
+      )}
+
+      {/* Extra hours overlay (striped only for the extra portion) */}
+      {extraFraction > 0 && (
+        <div
+          className="absolute left-0 right-0 bottom-0 pointer-events-none"
+          style={{
+            height: `${Math.min(100, extraFraction * 100)}%`,
+            backgroundImage:
+              'linear-gradient(135deg, rgba(255,255,255,0.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 75%, transparent 75%, transparent)',
+            backgroundSize: '12px 12px',
+            borderTop: '1px solid rgba(255,255,255,0.2)',
+          }}
+        />
       )}
 
       {/* Copy button */}

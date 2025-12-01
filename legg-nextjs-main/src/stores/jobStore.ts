@@ -47,6 +47,8 @@ export const useJobStore = create<JobStore>((set, get) => ({
         ...jobData,
         order: Math.floor(Number(jobData.order) || 0),
         cutOrder: Math.floor(Number(jobData.cutOrder) || 0),
+        extraHours: jobData.extraHours ?? 0,
+        extraCutHours: jobData.extraCutHours ?? 0,
       };
 
       const response = await fetch('/api/jobs', {
@@ -64,6 +66,8 @@ export const useJobStore = create<JobStore>((set, get) => ({
         cutStartDayId: newJob.cutStartDayId ?? null,
         updatedAt: newJob.updatedAt ?? new Date().toISOString(),
         createdAt: newJob.createdAt ?? new Date().toISOString(),
+        extraHours: newJob.extraHours ?? 0,
+        extraCutHours: newJob.extraCutHours ?? 0,
       };
 
       set((state) => ({ jobs: [...state.jobs, hydratedJob] }));
