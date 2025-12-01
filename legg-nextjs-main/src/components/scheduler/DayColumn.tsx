@@ -72,7 +72,7 @@ export function DayColumn({ day, segments, isFullScreen }: DayColumnProps) {
       {/* Header */}
       <div className="p-2 border-b border-white/5">
         <div className="flex items-center justify-between">
-          <span className={clsx('text-xs font-semibold', isToday && 'text-accent')}>
+          <span className={clsx('text-xs font-semibold flex-1 text-center', isToday && 'text-accent')}>
             {day.label}
           </span>
           <button
@@ -123,8 +123,12 @@ export function DayColumn({ day, segments, isFullScreen }: DayColumnProps) {
 
         {/* No capacity indicator */}
         {capacity === 0 && (
-          <div className="no-production-stripes rounded-lg p-4 text-center text-text-muted text-xs">
-            No production
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="no-production-stripes w-full h-full rounded-lg border border-white/10 bg-black/40 flex items-center justify-center">
+              <span className="text-sm font-semibold uppercase tracking-wide text-text">
+                No production
+              </span>
+            </div>
           </div>
         )}
 
@@ -176,11 +180,27 @@ function DayNote({ dayId }: DayNoteProps) {
   const dayNotes = useSettingsStore((state) => state.dayNotes);
   const setDayNote = useSettingsStore((state) => state.setDayNote);
   const saveDaySettings = useSettingsStore((state) => state.saveDaySettings);
+  const isFullScreen = useUIStore((state) => state.isFullScreen);
 
   const note = dayNotes[dayId] || '';
+  const hasNote = note.trim().length > 0;
+  const charCount = note.length;
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDayNote(dayId, e.target.value);
+  // Dynamically scale font size: shorter notes appear larger to fill the space.
+  const fontSize =
+    charCount <= 20 ? '18px' : charCount <= 60 ? '16px' : charCount <= 120 ? '14px' : '12px';
+
+  // Main view: always show. Fullscreen: show only when there is text.
+  if (isFullScreen && !hasNote) return null;
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const updated = e.target.value.toUpperCase();
+      setDayNote(dayId, updated);
+
+      // If the note is cleared out, persist the removal immediately since the field hides.
+    if (updated.trim().length === 0) {
+      saveDaySettings();
+    }
   };
 
   const handleBlur = () => {
@@ -191,15 +211,20 @@ function DayNote({ dayId }: DayNoteProps) {
     <div className="border-t border-white/5 p-1.5">
       <textarea
         className={clsx(
-          'w-full h-16 resize-none rounded-lg p-2',
+          'w-full h-16 resize-none rounded-lg p-2 text-center',
           'bg-bg-softer/50 border border-white/5',
-          'text-text text-xs placeholder:text-text-muted/30',
+          'text-gold-border text-xs placeholder:text-text-muted/30',
           'focus:outline-none focus:border-accent/50'
         )}
         placeholder="Day notes..."
         value={note}
         onChange={handleChange}
         onBlur={handleBlur}
+        style={{
+          fontSize,
+          lineHeight: 1.3,
+          textTransform: 'uppercase',
+        }}
       />
     </div>
   );

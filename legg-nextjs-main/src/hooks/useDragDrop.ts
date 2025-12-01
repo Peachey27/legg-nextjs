@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useJobStore } from '@/stores/jobStore';
 import { useUIStore } from '@/stores/uiStore';
-import { getViewFields } from '@/lib/utils/scheduling';
+import { getViewFields, normaliseAllOrders } from '@/lib/utils/scheduling';
 import type { Job, ViewMode } from '@/types';
 
 export function useDragDrop() {
@@ -25,18 +25,18 @@ export function useDragDrop() {
       const jobId = e.dataTransfer.getData('jobId');
       if (!jobId) return;
 
-      // Update local state - move job to backlog
+      // Update local state - move job to backlog in BOTH views
       const updatedJobs = jobs.map((j) => {
         if (j.id !== jobId) return j;
-        if (activeView === 'fab') {
-          return { ...j, startDayId: null };
-        } else {
-          return { ...j, cutStartDayId: null };
-        }
+        return {
+          ...j,
+          startDayId: null,
+          cutStartDayId: null,
+        };
       });
 
-      // Normalize orders and update
-      const normalized = normaliseOrdersForView(updatedJobs, activeView);
+      // Normalize orders for both views and update
+      const normalized = normaliseAllOrders(updatedJobs);
       setJobs(normalized);
 
       // Persist to API

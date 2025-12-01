@@ -34,10 +34,11 @@ export function AddJobForm() {
     }
 
     // Calculate max orders
-    const maxOrderFab = jobs.reduce((m, j) => Math.max(m, j.order), 0);
-    const maxOrderCut = jobs.reduce((m, j) => Math.max(m, j.cutOrder), 0);
+    // Ensure order values are integers to avoid API integer column errors
+    const maxOrderFab = jobs.reduce((m, j) => Math.max(m, Math.floor(Number(j.order) || 0)), 0);
+    const maxOrderCut = jobs.reduce((m, j) => Math.max(m, Math.floor(Number(j.cutOrder) || 0)), 0);
 
-    await addJob({
+    const created = await addJob({
       title: title.trim(),
       vquote: vquote.trim(),
       totalHours: hours,
@@ -50,6 +51,11 @@ export function AddJobForm() {
       cutStartDayId: null,
       cutOrder: maxOrderCut + 1,
     });
+
+    if (!created) {
+      alert('Failed to add job to backlog. Please try again.');
+      return;
+    }
 
     // Reset form
     setTitle('');

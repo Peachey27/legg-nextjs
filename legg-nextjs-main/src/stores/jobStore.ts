@@ -42,15 +42,32 @@ export const useJobStore = create<JobStore>((set, get) => ({
 
   addJob: async (jobData) => {
     try {
+      // Clamp orders to integers before sending to the API (DB uses integer columns)
+      const payload = {
+        ...jobData,
+        order: Math.floor(Number(jobData.order) || 0),
+        cutOrder: Math.floor(Number(jobData.cutOrder) || 0),
+      };
+
       const response = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(jobData),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error('Failed to create job');
       const newJob = await response.json();
-      set((state) => ({ jobs: [...state.jobs, newJob] }));
-      return newJob;
+
+      // Ensure fields are explicitly set for backlog logic and sorting
+      const hydratedJob = {
+        ...newJob,
+        startDayId: newJob.startDayId ?? null,
+        cutStartDayId: newJob.cutStartDayId ?? null,
+        updatedAt: newJob.updatedAt ?? new Date().toISOString(),
+        createdAt: newJob.createdAt ?? new Date().toISOString(),
+      };
+
+      set((state) => ({ jobs: [...state.jobs, hydratedJob] }));
+      return hydratedJob;
     } catch (error) {
       set({ error: (error as Error).message });
       return null;

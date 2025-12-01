@@ -25,6 +25,7 @@ interface NoteEntry {
 export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
   const jobs = useJobStore((state) => state.jobs);
   const { openEditJob } = useUIStore();
+  const isFullScreen = useUIStore((state) => state.isFullScreen);
 
   const noteEntries = useMemo(() => {
     const firstByJob: Record<string, Omit<NoteEntry, 'jobId'>> = {};
@@ -63,7 +64,8 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
   return (
     <aside
       className={clsx(
-        'w-75 flex-shrink-0 flex flex-col',
+        'flex-shrink-0 flex flex-col',
+        isFullScreen ? 'w-95' : 'w-75',
         'bg-notes-panel-gradient',
         'border-l border-white/5',
         'p-4'
@@ -97,7 +99,12 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
               <span className="text-[10px] text-text-muted">VQ {entry.vquote}</span>
             </div>
             <div className="text-[10px] text-accent mb-1">{entry.dayLabel}</div>
-            <div className="text-xs text-text-muted leading-relaxed">{entry.note}</div>
+            <div
+              className="text-sm font-bold leading-relaxed uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]"
+              style={{ color: '#ff3b6b' }}
+            >
+              {entry.note.toUpperCase()}
+            </div>
           </div>
         ))}
       </div>

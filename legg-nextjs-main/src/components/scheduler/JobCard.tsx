@@ -16,6 +16,7 @@ interface JobCardProps {
 export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardProps) {
   const { handleDragStart } = useDragDrop();
   const { openEditJob, setCopiedJob } = useUIStore();
+  const isFullScreen = useUIStore((state) => state.isFullScreen);
 
   const totalHours = isCutView ? job.cutHours : job.totalHours;
   const isPartial = hours < totalHours;
@@ -24,10 +25,10 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
   const textSize = heightPercent > 50 ? 'big' : heightPercent > 25 ? 'medium' : heightPercent > 12 ? 'small' : 'tiny';
 
   const textStyles = {
-    big: { title: 'text-base font-semibold', sub: 'text-sm', note: 'text-xs' },
-    medium: { title: 'text-sm font-semibold', sub: 'text-xs', note: 'text-xs' },
-    small: { title: 'text-xs font-semibold', sub: 'text-[10px]', note: 'text-[10px]' },
-    tiny: { title: 'text-[10px] font-semibold', sub: 'text-[8px]', note: 'text-[8px]' },
+    big: { title: 'text-base font-semibold', sub: 'text-sm', note: 'text-sm font-semibold' },
+    medium: { title: 'text-sm font-semibold', sub: 'text-xs', note: 'text-xs font-semibold' },
+    small: { title: 'text-xs font-semibold', sub: 'text-[10px]', note: 'text-[10px] font-semibold' },
+    tiny: { title: 'text-[10px] font-semibold', sub: 'text-[8px]', note: 'text-[8px] font-semibold' },
   }[textSize];
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -61,6 +62,15 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
       onDragStart={(e) => handleDragStart(e, job.id)}
       onDoubleClick={() => openEditJob(job.id)}
     >
+      {/* Large center title label (hidden for very short jobs) */}
+      {hours > 3 && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
+          <div className="text-2xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words">
+            {job.type === 'screens' && job.note ? job.note : job.title}
+          </div>
+        </div>
+      )}
+
       {/* Title */}
       <div className={clsx('font-semibold truncate', textStyles.title)}>
         {job.title.toUpperCase()}
@@ -79,7 +89,17 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView }: JobCardP
 
       {/* Note preview */}
       {job.note && textSize !== 'tiny' && (
-        <div className={clsx('truncate opacity-70', textStyles.note)}>
+        <div
+          className={clsx(
+            'truncate',
+            textStyles.note,
+            isFullScreen && 'text-lg font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] uppercase'
+          )}
+          style={{
+            color: '#ff3b6b',
+            textTransform: isFullScreen ? 'uppercase' : undefined,
+          }}
+        >
           {job.note}
         </div>
       )}
@@ -105,7 +125,9 @@ export function BacklogJob({ job }: BacklogJobProps) {
   const { openEditJob, setCopiedJob } = useUIStore();
   const activeView = useUIStore((state) => state.activeView);
 
-  const hours = activeView === 'cut' ? job.cutHours : job.totalHours;
+  const primaryHours = activeView === 'cut' ? job.cutHours : job.totalHours;
+  const fallbackHours = activeView === 'cut' ? job.totalHours : job.cutHours;
+  const hours = primaryHours > 0 ? primaryHours : fallbackHours;
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();

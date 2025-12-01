@@ -54,9 +54,20 @@ export function normaliseAllOrders(jobsArr: Job[]): Job[] {
 }
 
 export function getBacklogJobs(jobs: Job[], view: ViewMode): Job[] {
-  return jobs.filter((j) => {
+  // Backlog is per-view: only show jobs that are unscheduled in the active view.
+  const backlog = jobs.filter((j) => {
     const viewFields = getViewFields(j, view);
     return viewFields.startDayId === null && viewFields.hours > 0;
+  });
+
+  // Sort by order within the current view (stable with updatedAt as secondary).
+  return backlog.sort((a, b) => {
+    const aView = getViewFields(a, view);
+    const bView = getViewFields(b, view);
+    if (aView.order !== bView.order) return aView.order - bView.order;
+    const aUpdated = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const bUpdated = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    return bUpdated - aUpdated;
   });
 }
 
