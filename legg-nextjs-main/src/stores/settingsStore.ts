@@ -48,14 +48,19 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       const dayNotes: Record<string, string> = {};
 
       for (const ds of allSettings) {
+        const dayKey =
+          typeof ds.dayId === 'string'
+            ? ds.dayId.slice(0, 10)
+            : new Date(ds.dayId).toISOString().slice(0, 10);
+
         if (ds.capacityOverride !== null) {
-          dayCapacityOverrides[ds.dayId] = ds.capacityOverride;
+          dayCapacityOverrides[dayKey] = ds.capacityOverride;
         }
         if (ds.isFridayLocked !== null) {
-          fridayLocks[ds.dayId] = ds.isFridayLocked;
+          fridayLocks[dayKey] = ds.isFridayLocked;
         }
         if (ds.dayNote) {
-          dayNotes[ds.dayId] = ds.dayNote;
+          dayNotes[dayKey] = ds.dayNote;
         }
       }
 
