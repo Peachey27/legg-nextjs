@@ -34,16 +34,6 @@ export default function HomePage() {
     fetchDaySettings();
   }, [fetchJobs, fetchSettings, fetchDaySettings]);
 
-  // Auto-refresh data every 10 seconds
-  useEffect(() => {
-    const id = setInterval(() => {
-      fetchJobs();
-      fetchSettings();
-      fetchDaySettings();
-    }, 10000);
-    return () => clearInterval(id);
-  }, [fetchJobs, fetchSettings, fetchDaySettings]);
-
   // Navigation handlers
   const handlePrevWeek = () => {
     setStartMonday((prev) => addDays(prev, -7));
