@@ -13,7 +13,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <form
         method="POST"
-        action="/login"
+        action="/api/login"
         className="bg-[#111] p-6 rounded-lg shadow-lg border border-white/10 w-full max-w-sm space-y-4"
       >
         <h1 className="text-lg font-semibold text-center">Scheduler Login</h1>

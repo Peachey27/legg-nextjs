@@ -5,16 +5,16 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow login page, login API and static assets
-  if (
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/api/login') ||
-    pathname.startsWith('/_next') ||
-    pathname === '/favicon.ico' ||
-    pathname.startsWith('/icons') ||
-    pathname.startsWith('/images')
-  ) {
-    return NextResponse.next();
-  }
+ if (
+  pathname.startsWith('/login') ||
+  pathname.startsWith('/api') ||           // 👈 change this
+  pathname.startsWith('/_next') ||
+  pathname === '/favicon.ico' ||
+  pathname.startsWith('/icons') ||
+  pathname.startsWith('/images')
+) {
+  return NextResponse.next();
+}
 
   const authCookie = req.cookies.get('scheduler_auth');
   if (authCookie?.value === '1') {
