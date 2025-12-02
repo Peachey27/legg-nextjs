@@ -9,7 +9,10 @@ import { useJobStore } from '@/stores/jobStore';
 import type { JobType } from '@/types';
 
 export function EditJobModal() {
-  const { editingJobId, closeEditJob } = useUIStore();
+  const editingJobId = useUIStore((state) => state.editingJobId);
+  const closeEditJob = useUIStore((state) => state.closeEditJob);
+  const startEditing = useUIStore((state) => state.startEditing);
+  const stopEditing = useUIStore((state) => state.stopEditing);
   const jobs = useJobStore((state) => state.jobs);
   const updateJob = useJobStore((state) => state.updateJob);
   const deleteJob = useJobStore((state) => state.deleteJob);
@@ -25,6 +28,14 @@ export function EditJobModal() {
   const [jobType, setJobType] = useState<JobType>('windows');
   const [color, setColor] = useState('#ff6fae');
   const [note, setNote] = useState('');
+
+  useEffect(() => {
+    if (editingJobId) {
+      startEditing('edit-job');
+    } else {
+      stopEditing('edit-job');
+    }
+  }, [editingJobId, startEditing, stopEditing]);
 
   // Populate form when job changes
   useEffect(() => {
@@ -56,6 +67,7 @@ export function EditJobModal() {
       note: note.trim(),
     });
 
+    stopEditing('edit-job');
     closeEditJob();
   };
 
@@ -64,14 +76,20 @@ export function EditJobModal() {
 
     if (confirm('Are you sure you want to delete this job?')) {
       await deleteJob(editingJobId);
+      stopEditing('edit-job');
       closeEditJob();
     }
+  };
+
+  const handleClose = () => {
+    stopEditing('edit-job');
+    closeEditJob();
   };
 
   if (!job) return null;
 
   return (
-    <Modal isOpen={!!editingJobId} onClose={closeEditJob} title="Edit Job">
+    <Modal isOpen={!!editingJobId} onClose={handleClose} title="Edit Job">
       <div className="space-y-3">
         <Input
           label="Title"
@@ -175,7 +193,7 @@ export function EditJobModal() {
           Delete
         </Button>
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={closeEditJob}>
+          <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleSave}>

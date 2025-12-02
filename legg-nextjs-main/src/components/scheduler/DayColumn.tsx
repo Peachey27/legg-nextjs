@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { JobCard } from './JobCard';
 import { useDragDrop } from '@/hooks/useDragDrop';
 import { useUIStore } from '@/stores/uiStore';
@@ -184,34 +184,98 @@ function DayNote({ dayId }: DayNoteProps) {
   const setDayNote = useSettingsStore((state) => state.setDayNote);
   const saveDaySettings = useSettingsStore((state) => state.saveDaySettings);
   const isFullScreen = useUIStore((state) => state.isFullScreen);
+  const startEditing = useUIStore((state) => state.startEditing);
+  const stopEditing = useUIStore((state) => state.stopEditing);
 
   const note = dayNotes[dayId] || '';
   const hasNote = note.trim().length > 0;
   const charCount = note.length;
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startedEditingRef = useRef(false);
+  const isMountedRef = useRef(true);
 
   // Dynamically scale font size: shorter notes appear larger to fill the space.
   const fontSize =
     charCount <= 20 ? '18px' : charCount <= 60 ? '16px' : charCount <= 120 ? '14px' : '12px';
 
-  // Main view: always show. Fullscreen: show only when there is text.
-  if (isFullScreen && !hasNote) return null;
+  const isHidden = isFullScreen && !hasNote;
 
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const updated = e.target.value.toUpperCase();
-      setDayNote(dayId, updated);
-
-      // If the note is cleared out, persist the removal immediately since the field hides.
-    if (updated.trim().length === 0) {
-      saveDaySettings();
+  const flushSave = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      await saveDaySettings();
+      if (isMountedRef.current) {
+        setLastSavedAt(Date.now());
+      }
+    } finally {
+      if (isMountedRef.current) {
+        setIsSaving(false);
+      }
     }
+  }, [saveDaySettings]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updated = e.target.value.toUpperCase();
+    setDayNote(dayId, updated);
+
+    // If the note is cleared out, persist the removal immediately since the field hides.
+    if (updated.trim().length === 0) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+      flushSave();
+      return;
+    }
+
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      flushSave();
+    }, 800);
   };
 
   const handleBlur = () => {
-    saveDaySettings();
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+    flushSave().finally(() => {
+      if (startedEditingRef.current) {
+        stopEditing('day-note');
+        startedEditingRef.current = false;
+      }
+    });
   };
 
+  const handleFocus = () => {
+    startEditing('day-note');
+    startedEditingRef.current = true;
+  };
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+      isMountedRef.current = false;
+      if (startedEditingRef.current) {
+        stopEditing('day-note');
+        startedEditingRef.current = false;
+      }
+    };
+  }, [stopEditing]);
+
   return (
-    <div className="border-t border-white/5 p-1.5">
+    <div
+      className={clsx(
+        'border-t border-white/5 p-1.5',
+        isHidden && 'hidden'
+      )}
+    >
       <textarea
         className={clsx(
           'w-full h-16 resize-none rounded-lg p-2 text-center',
@@ -222,6 +286,7 @@ function DayNote({ dayId }: DayNoteProps) {
         placeholder="Day notes..."
         value={note}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         style={{
           fontSize,
@@ -229,6 +294,9 @@ function DayNote({ dayId }: DayNoteProps) {
           textTransform: 'uppercase',
         }}
       />
+      <div className="mt-1 text-[10px] text-text-muted text-right">
+        {isSaving ? 'Saving…' : lastSavedAt ? 'Saved' : ''}
+      </div>
     </div>
   );
 }

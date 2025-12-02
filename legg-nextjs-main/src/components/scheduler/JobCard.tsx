@@ -47,6 +47,8 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
     });
   };
 
+  const showCenterLabel = hours >= 3;
+
   return (
     <div
       className={clsx(
@@ -65,8 +67,8 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       onDragStart={(e) => handleDragStart(e, job.id)}
       onDoubleClick={() => openEditJob(job.id)}
     >
-      {/* Large center title label (hidden for very short jobs) */}
-      {combinedHours > 3 && (
+      {/* Large center title label (hidden for short segments < 3h) */}
+      {showCenterLabel && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
           <div className="text-2xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words">
             {job.type === 'screens' && job.note ? job.note : job.title}

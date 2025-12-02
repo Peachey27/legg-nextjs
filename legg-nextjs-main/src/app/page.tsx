@@ -23,6 +23,7 @@ export default function HomePage() {
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
   const fetchDaySettings = useSettingsStore((state) => state.fetchDaySettings);
   const isFullScreen = useUIStore((state) => state.isFullScreen);
+  const isEditing = useUIStore((state) => state.isEditing);
 
   const { days, schedule, backlogJobs } = useSchedule(startMonday);
 
@@ -33,6 +34,19 @@ export default function HomePage() {
     fetchSettings();
     fetchDaySettings();
   }, [fetchJobs, fetchSettings, fetchDaySettings]);
+
+  // Poll data periodically, but pause while any editor is active to avoid overwriting unsaved changes.
+  useEffect(() => {
+    const tick = () => {
+      if (isEditing) return;
+      fetchJobs();
+      fetchSettings();
+      fetchDaySettings();
+    };
+
+    const id = setInterval(tick, 30000);
+    return () => clearInterval(id);
+  }, [isEditing, fetchJobs, fetchSettings, fetchDaySettings]);
 
   // Navigation handlers
   const handlePrevWeek = () => {

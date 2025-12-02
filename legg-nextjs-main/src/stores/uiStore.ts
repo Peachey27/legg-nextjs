@@ -20,6 +20,8 @@ interface UIStore {
     color: string;
     note: string;
   } | null;
+  isEditing: boolean;
+  editingSources: string[];
 
   // Actions
   setActiveView: (view: ViewMode) => void;
@@ -35,6 +37,8 @@ interface UIStore {
   dismissGap: (dayId: string) => void;
   setCopiedJob: (template: UIStore['copiedJobTemplate']) => void;
   clearCopiedJob: () => void;
+  startEditing: (source: string) => void;
+  stopEditing: (source: string) => void;
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -46,6 +50,8 @@ export const useUIStore = create<UIStore>((set) => ({
   gapAlertDayId: null,
   dismissedGapDayId: null,
   copiedJobTemplate: null,
+  isEditing: false,
+  editingSources: [],
 
   setActiveView: (view) => set({ activeView: view }),
 
@@ -72,4 +78,19 @@ export const useUIStore = create<UIStore>((set) => ({
   setCopiedJob: (template) => set({ copiedJobTemplate: template }),
 
   clearCopiedJob: () => set({ copiedJobTemplate: null }),
+
+  startEditing: (source) =>
+    set((state) => {
+      const sources = new Set(state.editingSources);
+      sources.add(source);
+      return { editingSources: Array.from(sources), isEditing: true };
+    }),
+
+  stopEditing: (source) =>
+    set((state) => {
+      const sources = new Set(state.editingSources);
+      sources.delete(source);
+      const list = Array.from(sources);
+      return { editingSources: list, isEditing: list.length > 0 };
+    }),
 }));

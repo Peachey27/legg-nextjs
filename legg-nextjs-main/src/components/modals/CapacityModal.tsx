@@ -7,8 +7,11 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { getDayCapacity } from '@/lib/utils/capacity';
 
 export function CapacityModal() {
-  const { capEditDay, closeCapEdit } = useUIStore();
+  const capEditDay = useUIStore((state) => state.capEditDay);
+  const closeCapEdit = useUIStore((state) => state.closeCapEdit);
   const settings = useSettingsStore();
+  const startEditing = useUIStore((state) => state.startEditing);
+  const stopEditing = useUIStore((state) => state.stopEditing);
 
   const [capacity, setCapacity] = useState('');
   const [useDefault, setUseDefault] = useState(true);
@@ -30,6 +33,12 @@ export function CapacityModal() {
 
   useEffect(() => {
     if (capEditDay) {
+      startEditing('capacity-modal');
+    } else {
+      stopEditing('capacity-modal');
+    }
+
+    if (capEditDay) {
       const override = settings.dayCapacityOverrides[capEditDay.id];
       if (override !== undefined) {
         setCapacity(override.toString());
@@ -39,7 +48,7 @@ export function CapacityModal() {
         setUseDefault(true);
       }
     }
-  }, [capEditDay, settings.dayCapacityOverrides, defaultCapacity]);
+  }, [capEditDay, settings.dayCapacityOverrides, defaultCapacity, startEditing, stopEditing]);
 
   const handleSave = async () => {
     if (!capEditDay) return;
@@ -51,13 +60,19 @@ export function CapacityModal() {
     }
 
     await settings.saveDaySettings();
+    stopEditing('capacity-modal');
+    closeCapEdit();
+  };
+
+  const handleClose = () => {
+    stopEditing('capacity-modal');
     closeCapEdit();
   };
 
   if (!capEditDay) return null;
 
   return (
-    <Modal isOpen={!!capEditDay} onClose={closeCapEdit} title={`Edit Capacity: ${capEditDay.label}`}>
+    <Modal isOpen={!!capEditDay} onClose={handleClose} title={`Edit Capacity: ${capEditDay.label}`}>
       <div className="space-y-4">
         <div className="text-xs text-text-muted">
           Default capacity for this day: {defaultCapacity}h
@@ -86,7 +101,7 @@ export function CapacityModal() {
       </div>
 
       <ModalActions>
-        <Button variant="ghost" onClick={closeCapEdit}>
+        <Button variant="ghost" onClick={handleClose}>
           Cancel
         </Button>
         <Button variant="primary" onClick={handleSave}>
