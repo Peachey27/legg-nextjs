@@ -1,13 +1,16 @@
-// src/app/login/page.tsx
+'use client';
 
-type LoginPageProps = {
-  searchParams?: {
-    error?: string;
-  };
-};
+import { useEffect, useState } from 'react';
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const error = searchParams?.error;
+export default function LoginPage() {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setHasError(params.get('error') === '1');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -17,7 +20,6 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         className="bg-[#111] p-6 rounded-lg shadow-lg border border-white/10 w-full max-w-sm space-y-4"
       >
         <h1 className="text-lg font-semibold text-center">Scheduler Login</h1>
-
         <div className="space-y-2">
           <label className="block text-sm text-white/80" htmlFor="password">
             Password
@@ -31,11 +33,9 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             required
           />
         </div>
-
-        {error && (
+        {hasError && (
           <div className="text-red-400 text-sm">Incorrect password</div>
         )}
-
         <button
           type="submit"
           className="w-full py-2 rounded bg-accent text-black font-semibold"
