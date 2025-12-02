@@ -1,16 +1,9 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
-export default function LoginPage() {
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      setHasError(params.get('error') === '1');
-    }
-  }, []);
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { error?: string };
+}) {
+  const hasError = searchParams?.error === '1';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
