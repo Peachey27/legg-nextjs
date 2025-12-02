@@ -1,5 +1,5 @@
-'use client';
-
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { Header } from '@/components/layout/Header';
@@ -15,7 +15,9 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSchedule } from '@/hooks/useSchedule';
 import { startOfThisWeekMonday, addDays } from '@/lib/utils/dates';
 
-export default function HomePage() {
+function ClientApp() {
+  'use client';
+
   const [startMonday, setStartMonday] = useState(() => startOfThisWeekMonday());
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -109,4 +111,13 @@ export default function HomePage() {
       <CapacityModal />
     </div>
   );
+}
+
+export default function HomePage() {
+  const authCookie = cookies().get('scheduler_auth');
+  if (authCookie?.value !== '1') {
+    redirect('/login');
+  }
+
+  return <ClientApp />;
 }
