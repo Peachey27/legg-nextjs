@@ -6,11 +6,15 @@ export async function POST(request: NextRequest) {
   const submitted = formData.get('password');
 
   if (password && submitted === password) {
+    const isProd = process.env.NODE_ENV === 'production';
     const res = NextResponse.redirect(new URL('/', request.url));
-    res.headers.set(
-      'Set-Cookie',
-      `scheduler_auth=1; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${60 * 60 * 24 * 30}`
-    );
+    res.cookies.set('scheduler_auth', '1', {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
     return res;
   }
 
