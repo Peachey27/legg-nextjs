@@ -83,3 +83,16 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+// OPTIONS /api/day-settings - CORS / preflight support
+export function OPTIONS() {
+  return NextResponse.json(
+    {},
+    {
+      status: 200,
+      headers: {
+        'Allow': 'GET,PUT,OPTIONS',
+      },
+    }
+  );
+}
