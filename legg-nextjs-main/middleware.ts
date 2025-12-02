@@ -31,7 +31,3 @@ export function middleware(req: NextRequest) {
   url.pathname = '/login';
   return NextResponse.redirect(url);
 }
-
-export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icons|images).*)'],
-};
