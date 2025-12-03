@@ -18,6 +18,7 @@ import { startOfThisWeekMonday, addDays } from '@/lib/utils/dates';
 export default function SchedulerApp() {
   const [startMonday, setStartMonday] = useState(() => startOfThisWeekMonday());
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchJobs = useJobStore((state) => state.fetchJobs);
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
@@ -83,12 +84,19 @@ export default function SchedulerApp() {
         onPrevWeek={handlePrevWeek}
         onThisWeek={handleThisWeek}
         onNextWeek={handleNextWeek}
+        onToggleSidebar={() => setIsSidebarOpen((v) => !v)}
+        isSidebarOpen={isSidebarOpen}
       />
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <Sidebar backlogJobs={backlogJobs} isHidden={isFullScreen} />
+        <Sidebar
+          backlogJobs={backlogJobs}
+          isHidden={isFullScreen}
+          isMobileOpen={isSidebarOpen}
+          onMobileClose={() => setIsSidebarOpen(false)}
+        />
 
         {/* Scheduler Grid */}
         <SchedulerGrid

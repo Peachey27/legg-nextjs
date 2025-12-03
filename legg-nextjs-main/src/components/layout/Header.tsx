@@ -14,6 +14,8 @@ interface HeaderProps {
   onPrevWeek: () => void;
   onThisWeek: () => void;
   onNextWeek: () => void;
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
 export function Header({
@@ -21,6 +23,8 @@ export function Header({
   onPrevWeek,
   onThisWeek,
   onNextWeek,
+  onToggleSidebar,
+  isSidebarOpen,
 }: HeaderProps) {
   const { activeView, setActiveView, isFullScreen, toggleFullScreen, openSettings } = useUIStore();
   const settings = useSettingsStore();
@@ -80,6 +84,14 @@ export function Header({
     <header className="px-4 py-3 border-b border-white/5 flex items-center justify-between gap-4 flex-shrink-0">
       {/* Left: Title */}
       <div className="flex items-center gap-4">
+        <button
+          type="button"
+          className="lg:hidden flex items-center justify-center px-3 py-2 rounded bg-accent text-bg text-xs font-semibold"
+          onClick={onToggleSidebar}
+        >
+          {isSidebarOpen ? 'Close Menu' : 'Open Menu'}
+        </button>
+
         <h1 className="text-lg font-bold text-text whitespace-nowrap">
           LEGG Scheduler (LOGIN TEST)
         </h1>
@@ -93,7 +105,7 @@ export function Header({
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {/* View Toggle */}
         <div className="flex rounded-pill border border-border overflow-hidden">
           <ViewButton
