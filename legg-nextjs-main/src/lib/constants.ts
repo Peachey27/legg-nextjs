@@ -15,7 +15,7 @@ export const JOB_COLORS = [
   '#2b9df4', // blue
   '#95e062', // lime
   '#ffd166', // yellow
-  '#ff3b6b', // coral
+  '#ff1744', // bright red
   '#a78bfa', // violet
   '#4fd1c5', // teal
   '#ff922b', // orange
