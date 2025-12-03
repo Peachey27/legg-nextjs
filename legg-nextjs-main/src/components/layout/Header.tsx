@@ -93,7 +93,7 @@ export function Header({
         </button>
 
         <h1 className="text-lg font-bold text-text whitespace-nowrap">
-          LEGG Scheduler (LOGIN TEST)
+          LEGG Scheduler (LIVE APP)
         </h1>
 
         {/* Week Stats */}
