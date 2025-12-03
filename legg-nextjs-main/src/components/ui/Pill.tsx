@@ -44,7 +44,7 @@ export function VQPill({ vquote, className }: VQPillProps) {
     <span
       className={clsx(
         'inline-flex items-center px-1.5 py-0.5 rounded',
-        'bg-white/20 text-[10px] font-bold',
+        'bg-white/20 text-xs font-bold',
         className
       )}
     >

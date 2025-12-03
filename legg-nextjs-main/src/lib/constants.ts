@@ -20,6 +20,7 @@ export const JOB_COLORS = [
   '#4fd1c5', // teal
   '#ff922b', // orange
   '#2ec27e', // green
+  '#000000', // black (striped option)
 ] as const;
 
 export const DEFAULT_JOB_COLOR = JOB_COLORS[0];

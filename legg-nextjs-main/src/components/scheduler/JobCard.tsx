@@ -23,6 +23,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
   const extraHours = isCutView ? job.extraCutHours ?? 0 : job.extraHours ?? 0;
   const combinedHours = totalHours + extraHours;
   const isPartial = hours < combinedHours;
+  const isBlackCard = (job.color || '').toLowerCase() === '#000000' || (job.color || '').toLowerCase() === 'black';
 
   // Determine text size based on height
   const textSize = heightPercent > 50 ? 'big' : heightPercent > 25 ? 'medium' : heightPercent > 12 ? 'small' : 'tiny';
@@ -84,7 +85,10 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       {/* VQ + Hours */}
       <div className={clsx('flex items-center gap-1 flex-wrap', textStyles.sub)}>
         {job.vquote && <VQPill vquote={job.vquote} />}
-        <span className={clsx(isPartial && 'text-yellow-600')}>
+        <span
+          className={clsx(isPartial && 'text-yellow-600')}
+          style={{ color: isBlackCard ? '#fff' : '#000' }}
+        >
           {isPartial ? `${hours.toFixed(1)}/${combinedHours}h` : `${combinedHours}h`}
         </span>
         {job.type === 'screens' && (
@@ -147,6 +151,7 @@ export function BacklogJob({ job }: BacklogJobProps) {
   const primaryHours = activeView === 'cut' ? job.cutHours : job.totalHours;
   const fallbackHours = activeView === 'cut' ? job.totalHours : job.cutHours;
   const hours = primaryHours > 0 ? primaryHours : fallbackHours;
+  const isBlackCard = (job.color || '').toLowerCase() === '#000000' || (job.color || '').toLowerCase() === 'black';
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -178,7 +183,7 @@ export function BacklogJob({ job }: BacklogJobProps) {
       </div>
       <div className="flex items-center gap-1 text-[10px] mt-0.5">
         {job.vquote && <VQPill vquote={job.vquote} />}
-        <span>{hours}h</span>
+        <span style={{ color: isBlackCard ? '#fff' : '#000' }}>{hours}h</span>
         {job.type === 'screens' && (
           <span className="bg-job-lime/30 px-1 rounded text-job-lime">screens</span>
         )}
