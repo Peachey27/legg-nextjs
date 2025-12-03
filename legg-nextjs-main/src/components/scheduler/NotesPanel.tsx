@@ -86,14 +86,17 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
             key={entry.jobId}
             className={clsx(
               'rounded-lg p-2 cursor-pointer',
-              'border-l-4 bg-bg-soft/50',
+              'bg-bg-soft/50',
               'hover:bg-bg-softer/70 transition-colors'
             )}
-            style={{ borderLeftColor: entry.color }}
+            style={{ borderLeftColor: entry.color, borderLeftWidth: '8px', borderStyle: 'solid' }}
             onDoubleClick={() => openEditJob(entry.jobId)}
           >
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-sm text-black bg-white/70 px-1.5 py-0.5 rounded">
+              <span
+                className="font-semibold text-base text-black px-2 py-0.5 rounded"
+                style={{ backgroundColor: entry.color }}
+              >
                 {entry.title.toUpperCase()}
               </span>
               <span className="text-[10px] text-text-muted">VQ {entry.vquote}</span>
