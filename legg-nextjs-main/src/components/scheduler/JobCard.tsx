@@ -71,7 +71,10 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       {/* Large center title label (hidden for short segments < 3h) */}
       {showCenterLabel && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
-          <div className="text-2xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words">
+          <div
+            className="text-3xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words"
+            style={{ wordBreak: 'normal', overflowWrap: 'break-word' }}
+          >
             {job.type === 'screens' && job.note ? job.note : job.title}
           </div>
         </div>
