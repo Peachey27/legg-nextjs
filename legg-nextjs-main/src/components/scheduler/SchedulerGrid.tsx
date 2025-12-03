@@ -65,15 +65,13 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
     return map;
   }, [activeView, days, jobs, scheduleByDay]);
 
+  const today = startOfToday();
+  const todayId = toISODateString(today);
+  const prevFridayId = toISODateString(getPreviousFriday(today));
+
   // Auto-scroll to previous Friday or today on mount
   useEffect(() => {
     if (!scrollRef.current || days.length === 0) return;
-
-    const today = startOfToday();
-    const prevFriday = getPreviousFriday(today);
-
-    const prevFridayId = toISODateString(prevFriday);
-    const todayId = toISODateString(today);
 
     const idxPrevFriday = days.findIndex((d) => d.id === prevFridayId);
     const idxToday = days.findIndex((d) => d.id === todayId);
@@ -96,7 +94,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
       const offset = targetEl.offsetLeft;
       scrollRef.current.scrollTo({ left: offset, behavior: 'smooth' });
     }
-  }, [days]);
+  }, [days, prevFridayId, todayId]);
 
   return (
     <div
