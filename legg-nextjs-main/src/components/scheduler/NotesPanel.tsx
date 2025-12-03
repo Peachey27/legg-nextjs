@@ -93,7 +93,7 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
             onDoubleClick={() => openEditJob(entry.jobId)}
           >
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-xs text-text">
+              <span className="font-semibold text-sm text-black bg-white/70 px-1.5 py-0.5 rounded">
                 {entry.title.toUpperCase()}
               </span>
               <span className="text-[10px] text-text-muted">VQ {entry.vquote}</span>
