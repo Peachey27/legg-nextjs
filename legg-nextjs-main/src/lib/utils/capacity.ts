@@ -30,9 +30,11 @@ export function getDayCapacity(
     fridayLocks,
   } = params;
 
-  // Apply explicit override for any view
-  const override = dayCapacityOverrides[day.id];
-  if (override !== undefined) return override;
+  // Apply explicit override only in Fab view
+  if (view === 'fab') {
+    const override = dayCapacityOverrides[day.id];
+    if (override !== undefined) return override;
+  }
 
   if (view === 'cut') {
     if (day.isFriday) return cutFriCapacity;
