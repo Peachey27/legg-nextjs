@@ -76,12 +76,16 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
     const idxPrevFriday = days.findIndex((d) => d.id === prevFridayId);
     const idxToday = days.findIndex((d) => d.id === todayId);
 
-    const targetIdx =
-      idxPrevFriday !== -1
-        ? idxPrevFriday
-        : idxToday !== -1
-        ? Math.max(0, idxToday - 1)
-        : 0;
+    let targetIdx = 0;
+
+    if (isFullScreen && idxToday !== -1) {
+      // In fullscreen, show yesterday + today (today is second column)
+      targetIdx = Math.max(0, idxToday - 1);
+    } else if (idxPrevFriday !== -1) {
+      targetIdx = idxPrevFriday;
+    } else if (idxToday !== -1) {
+      targetIdx = Math.max(0, idxToday - 1);
+    }
 
     const targetDayId = days[targetIdx]?.id;
     if (!targetDayId) return;
@@ -94,7 +98,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
       const offset = targetEl.offsetLeft;
       scrollRef.current.scrollTo({ left: offset, behavior: 'smooth' });
     }
-  }, [days, prevFridayId, todayId]);
+  }, [days, prevFridayId, todayId, isFullScreen]);
 
   return (
     <div
