@@ -103,6 +103,7 @@ export default function SchedulerApp() {
           days={days}
           scheduleByDay={schedule.scheduleByDay}
           isFullScreen={isFullScreen}
+          startMonday={startMonday}
         />
 
         {/* Notes Panel (fullscreen only) */}

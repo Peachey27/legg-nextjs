@@ -112,37 +112,37 @@ export function Header({
             active={activeView === 'fab'}
             onClick={() => setActiveView('fab')}
           >
-            Fab 🔨
+            Fab
           </ViewButton>
           <ViewButton
             active={activeView === 'cut'}
             onClick={() => setActiveView('cut')}
           >
-            Cut & prep ✂
+            Cut & prep
           </ViewButton>
         </div>
 
         {/* Week Navigation */}
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={onPrevWeek}>
-            ← Prev
+            Prev week
           </Button>
           <Button variant="ghost" size="sm" onClick={onThisWeek}>
-            This week
+            Today
           </Button>
           <Button variant="ghost" size="sm" onClick={onNextWeek}>
-            Next →
+            Next week
           </Button>
         </div>
 
         {/* Fullscreen Toggle */}
         <Button variant="ghost" size="sm" onClick={toggleFullScreen}>
-          {isFullScreen ? '⊟' : '⊞'}
+          {isFullScreen ? 'Exit full screen' : 'Full screen'}
         </Button>
 
         {/* Settings */}
         <Button variant="ghost" size="sm" onClick={openSettings}>
-          ⚙
+          Settings
         </Button>
       </div>
     </header>

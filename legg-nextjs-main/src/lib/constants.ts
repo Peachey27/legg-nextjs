@@ -8,7 +8,8 @@ export const DEFAULT_CAPACITY = {
 };
 
 export const WEEKS_AHEAD = 12;
-export const WEEKS_BACK = 2;
+// Show 4 weeks of history instead of 2
+export const WEEKS_BACK = 4;
 
 export const JOB_COLORS = [
   '#ff6fae', // pink

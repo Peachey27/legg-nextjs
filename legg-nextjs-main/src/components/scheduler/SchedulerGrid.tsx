@@ -3,7 +3,7 @@
 import { clsx } from 'clsx';
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { DayColumn } from './DayColumn';
-import { startOfToday, getPreviousFriday, toISODateString } from '@/lib/utils/dates';
+import { startOfToday, getPreviousFriday, toISODateString, startOfThisWeekMonday } from '@/lib/utils/dates';
 import { useJobStore } from '@/stores/jobStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { Day, ScheduleByDay } from '@/types';
@@ -12,9 +12,10 @@ interface SchedulerGridProps {
   days: Day[];
   scheduleByDay: ScheduleByDay;
   isFullScreen?: boolean;
+  startMonday: Date;
 }
 
-export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGridProps) {
+export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday }: SchedulerGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const jobs = useJobStore((state) => state.jobs);
   const activeView = useUIStore((state) => state.activeView);
@@ -68,18 +69,33 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
   const today = startOfToday();
   const todayId = toISODateString(today);
   const prevFridayId = toISODateString(getPreviousFriday(today));
+  const anchorId = toISODateString(startMonday);
+  const currentWeekMondayId = toISODateString(startOfThisWeekMonday());
 
   // Auto-scroll to previous Friday or today on mount
   useEffect(() => {
     if (!scrollRef.current || days.length === 0) return;
 
+    const idxAnchor = days.findIndex((d) => d.id === anchorId);
     const idxPrevFriday = days.findIndex((d) => d.id === prevFridayId);
     const idxToday = days.findIndex((d) => d.id === todayId);
+    const isCurrentWeek = anchorId === currentWeekMondayId;
 
     let targetIdx = 0;
 
-    if (isFullScreen && idxToday !== -1) {
-      // In fullscreen, show yesterday + today (today is second column)
+    if (isCurrentWeek && idxToday !== -1) {
+      // Column 1 = previous workday, Column 2 = today
+      let idxPrevWorkday = 0;
+      for (let i = idxToday - 1; i >= 0; i--) {
+        if (days[i]) {
+          idxPrevWorkday = i;
+          break;
+        }
+      }
+      targetIdx = idxPrevWorkday;
+    } else if (idxAnchor !== -1) {
+      targetIdx = idxAnchor;
+    } else if (isFullScreen && idxToday !== -1) {
       targetIdx = Math.max(0, idxToday - 1);
     } else if (idxPrevFriday !== -1) {
       targetIdx = idxPrevFriday;
@@ -98,7 +114,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen }: SchedulerGr
       const offset = targetEl.offsetLeft;
       scrollRef.current.scrollTo({ left: offset, behavior: 'smooth' });
     }
-  }, [days, prevFridayId, todayId, isFullScreen]);
+  }, [days, prevFridayId, todayId, isFullScreen, anchorId, currentWeekMondayId]);
 
   return (
     <div
