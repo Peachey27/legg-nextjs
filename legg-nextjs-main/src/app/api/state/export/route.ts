@@ -26,13 +26,16 @@ export async function GET() {
     }));
 
     // Convert day settings to records
-    const dayCapacityOverrides: Record<string, number> = {};
+    const dayCapacityOverrides: Record<string, { fab?: number; cut?: number }> = {};
     const fridayLocks: Record<string, boolean> = {};
     const dayNotes: Record<string, string> = {};
 
     for (const ds of allDaySettings) {
       if (ds.capacityOverride !== null) {
-        dayCapacityOverrides[ds.dayId] = ds.capacityOverride;
+        dayCapacityOverrides[ds.dayId] = { ...(dayCapacityOverrides[ds.dayId] || {}), fab: ds.capacityOverride };
+      }
+      if (ds.cutCapacityOverride !== null && ds.cutCapacityOverride !== undefined) {
+        dayCapacityOverrides[ds.dayId] = { ...(dayCapacityOverrides[ds.dayId] || {}), cut: ds.cutCapacityOverride };
       }
       if (ds.isFridayLocked !== null) {
         fridayLocks[ds.dayId] = ds.isFridayLocked;

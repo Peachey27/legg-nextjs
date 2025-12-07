@@ -45,9 +45,16 @@ export async function POST(request: NextRequest) {
     ]);
 
     for (const dayId of Array.from(allDayIds)) {
+      const rawOverride = dayCapacityOverrides?.[dayId];
+      const fabOverride =
+        typeof rawOverride === 'number' ? rawOverride : rawOverride?.fab ?? null;
+      const cutOverride =
+        typeof rawOverride === 'number' ? null : rawOverride?.cut ?? null;
+
       await db.insert(daySettings).values({
         dayId,
-        capacityOverride: dayCapacityOverrides?.[dayId] ?? null,
+        capacityOverride: fabOverride ?? null,
+        cutCapacityOverride: cutOverride ?? null,
         isFridayLocked: fridayLocks?.[dayId] ?? null,
         dayNote: dayNotes?.[dayId] ?? '',
       });

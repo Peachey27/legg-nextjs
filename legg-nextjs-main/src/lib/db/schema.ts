@@ -22,6 +22,7 @@ export const jobs = pgTable('jobs', {
 export const daySettings = pgTable('day_settings', {
   dayId: date('day_id').primaryKey(),
   capacityOverride: integer('capacity_override'),
+  cutCapacityOverride: integer('cut_capacity_override'),
   isFridayLocked: boolean('is_friday_locked'),
   dayNote: text('day_note').default(''),
 });

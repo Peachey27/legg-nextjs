@@ -30,6 +30,7 @@ export async function PUT(request: NextRequest) {
     const settings = body as {
       dayId: string;
       capacityOverride?: number | null;
+      cutCapacityOverride?: number | null;
       isFridayLocked?: boolean | null;
       dayNote?: string;
     }[];
@@ -44,6 +45,7 @@ export async function PUT(request: NextRequest) {
       console.log('[day-settings] upsert', {
         dayId,
         capacityOverride: setting.capacityOverride,
+        cutCapacityOverride: setting.cutCapacityOverride,
         isFridayLocked: setting.isFridayLocked,
         dayNote: setting.dayNote,
       });
@@ -53,6 +55,7 @@ export async function PUT(request: NextRequest) {
         .values({
           dayId,
           capacityOverride: setting.capacityOverride ?? null,
+          cutCapacityOverride: setting.cutCapacityOverride ?? null,
           isFridayLocked: setting.isFridayLocked ?? null,
           dayNote: setting.dayNote ?? '',
         })
@@ -60,6 +63,7 @@ export async function PUT(request: NextRequest) {
           target: daySettings.dayId,
           set: {
             capacityOverride: setting.capacityOverride ?? null,
+            cutCapacityOverride: setting.cutCapacityOverride ?? null,
             isFridayLocked: setting.isFridayLocked ?? null,
             dayNote: setting.dayNote ?? '',
           },

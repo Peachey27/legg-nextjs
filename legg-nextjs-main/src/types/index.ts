@@ -30,6 +30,7 @@ export interface Day {
 export interface DaySettings {
   dayId: string;
   capacityOverride: number | null;
+  cutCapacityOverride: number | null;
   isFridayLocked: boolean | null;
   dayNote: string;
 }

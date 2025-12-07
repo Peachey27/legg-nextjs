@@ -63,7 +63,7 @@ export function Header({
         return total + settings.cutMonThuCapacity;
       }
 
-      const override = settings.dayCapacityOverrides[day.id];
+      const override = settings.dayCapacityOverrides[day.id]?.[activeView];
       if (override !== undefined) return total + override;
 
       if (day.isFriday) {

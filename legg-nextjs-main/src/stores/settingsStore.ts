@@ -1,10 +1,10 @@
 'use client';
 
 import { create } from 'zustand';
-import { DEFAULT_SETTINGS, type AppSettings } from '@/types';
+import { DEFAULT_SETTINGS, type AppSettings, type ViewMode } from '@/types';
 
 interface SettingsStore extends AppSettings {
-  dayCapacityOverrides: Record<string, number>;
+  dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
   fridayLocks: Record<string, boolean>;
   dayNotes: Record<string, string>;
   isLoading: boolean;
@@ -13,7 +13,7 @@ interface SettingsStore extends AppSettings {
   fetchSettings: () => Promise<void>;
   fetchDaySettings: () => Promise<void>;
   updateSettings: (updates: Partial<AppSettings>) => Promise<void>;
-  setDayCapacityOverride: (dayId: string, capacity: number | undefined) => void;
+  setDayCapacityOverride: (dayId: string, view: ViewMode, capacity: number | undefined) => void;
   toggleFridayLock: (dayId: string) => void;
   setDayNote: (dayId: string, note: string) => void;
   saveDaySettings: () => Promise<void>;
@@ -43,7 +43,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       if (!response.ok) return;
       const allSettings = await response.json();
 
-      const dayCapacityOverrides: Record<string, number> = {};
+      const dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>> = {};
       const fridayLocks: Record<string, boolean> = {};
       const dayNotes: Record<string, string> = {};
 
@@ -54,7 +54,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
             : new Date(ds.dayId).toISOString().slice(0, 10);
 
         if (ds.capacityOverride !== null) {
-          dayCapacityOverrides[dayKey] = ds.capacityOverride;
+          dayCapacityOverrides[dayKey] = { ...(dayCapacityOverrides[dayKey] || {}), fab: ds.capacityOverride };
+        }
+        if (ds.cutCapacityOverride !== null && ds.cutCapacityOverride !== undefined) {
+          dayCapacityOverrides[dayKey] = { ...(dayCapacityOverrides[dayKey] || {}), cut: ds.cutCapacityOverride };
         }
         if (ds.isFridayLocked !== null) {
           fridayLocks[dayKey] = ds.isFridayLocked;
@@ -98,14 +101,24 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     }
   },
 
-  setDayCapacityOverride: (dayId, capacity) => {
+  setDayCapacityOverride: (dayId, view, capacity) => {
     set((state) => {
       const newOverrides = { ...state.dayCapacityOverrides };
+      const current = newOverrides[dayId] || {};
+      const updated: Partial<Record<ViewMode, number>> = { ...current };
+
       if (capacity === undefined) {
+        delete updated[view];
+      } else {
+        updated[view] = capacity;
+      }
+
+      if (Object.keys(updated).length === 0) {
         delete newOverrides[dayId];
       } else {
-        newOverrides[dayId] = capacity;
+        newOverrides[dayId] = updated;
       }
+
       return { dayCapacityOverrides: newOverrides };
     });
   },
@@ -142,7 +155,8 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
 
     const settings = Array.from(allDayIds).map((dayId) => ({
       dayId,
-      capacityOverride: dayCapacityOverrides[dayId] ?? null,
+      capacityOverride: dayCapacityOverrides[dayId]?.fab ?? null,
+      cutCapacityOverride: dayCapacityOverrides[dayId]?.cut ?? null,
       isFridayLocked: fridayLocks[dayId] ?? null,
       dayNote: dayNotes[dayId] ?? '',
     }));

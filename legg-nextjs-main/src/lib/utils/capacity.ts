@@ -1,7 +1,7 @@
 import type { Day, ViewMode, AppSettings } from '@/types';
 
 interface CapacityParams extends AppSettings {
-  dayCapacityOverrides: Record<string, number>;
+  dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
   fridayLocks: Record<string, boolean>;
 }
 
@@ -24,17 +24,15 @@ export function getDayCapacity(
     friUnlockedCapacity,
     friLockedCapacity,
     saturdayCapacity,
-    cutMonThuCapacity,
-    cutFriCapacity,
-    dayCapacityOverrides,
-    fridayLocks,
-  } = params;
+  cutMonThuCapacity,
+  cutFriCapacity,
+  dayCapacityOverrides,
+  fridayLocks,
+} = params;
 
-  // Apply explicit override only in Fab view
-  if (view === 'fab') {
-    const override = dayCapacityOverrides[day.id];
-    if (override !== undefined) return override;
-  }
+  // Apply explicit override for the current view when present
+  const override = dayCapacityOverrides[day.id]?.[view];
+  if (override !== undefined) return override;
 
   if (view === 'cut') {
     if (day.isFriday) return cutFriCapacity;

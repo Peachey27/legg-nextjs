@@ -12,6 +12,7 @@ export function CapacityModal() {
   const settings = useSettingsStore();
   const startEditing = useUIStore((state) => state.startEditing);
   const stopEditing = useUIStore((state) => state.stopEditing);
+  const activeView = useUIStore((state) => state.activeView);
 
   const [capacity, setCapacity] = useState('');
   const [useDefault, setUseDefault] = useState(true);
@@ -24,12 +25,12 @@ export function CapacityModal() {
     saturdayCapacity: settings.saturdayCapacity,
     cutMonThuCapacity: settings.cutMonThuCapacity,
     cutFriCapacity: settings.cutFriCapacity,
-    dayCapacityOverrides: {},
+    dayCapacityOverrides: settings.dayCapacityOverrides,
     fridayLocks: settings.fridayLocks,
   };
 
   // Calculate default capacity for this day
-  const defaultCapacity = capEditDay ? getDayCapacity(capEditDay, params, 'fab') : 0;
+  const defaultCapacity = capEditDay ? getDayCapacity(capEditDay, params, activeView) : 0;
 
   useEffect(() => {
     if (capEditDay) {
@@ -39,7 +40,7 @@ export function CapacityModal() {
     }
 
     if (capEditDay) {
-      const override = settings.dayCapacityOverrides[capEditDay.id];
+      const override = settings.dayCapacityOverrides[capEditDay.id]?.[activeView];
       if (override !== undefined) {
         setCapacity(override.toString());
         setUseDefault(false);
@@ -48,15 +49,15 @@ export function CapacityModal() {
         setUseDefault(true);
       }
     }
-  }, [capEditDay, settings.dayCapacityOverrides, defaultCapacity, startEditing, stopEditing]);
+  }, [capEditDay, settings.dayCapacityOverrides, defaultCapacity, startEditing, stopEditing, activeView]);
 
   const handleSave = async () => {
     if (!capEditDay) return;
 
     if (useDefault) {
-      settings.setDayCapacityOverride(capEditDay.id, undefined);
+      settings.setDayCapacityOverride(capEditDay.id, activeView, undefined);
     } else {
-      settings.setDayCapacityOverride(capEditDay.id, Number(capacity) || 0);
+      settings.setDayCapacityOverride(capEditDay.id, activeView, Number(capacity) || 0);
     }
 
     await settings.saveDaySettings();

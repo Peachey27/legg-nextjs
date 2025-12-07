@@ -2,7 +2,7 @@ import type { Job, ViewMode, Day, ScheduleByDay, AppSettings } from '@/types';
 import { getDayCapacity, isFridayLocked } from './capacity';
 
 interface ScheduleParams extends AppSettings {
-  dayCapacityOverrides: Record<string, number>;
+  dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
   fridayLocks: Record<string, boolean>;
 }
 
