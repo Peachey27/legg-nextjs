@@ -118,7 +118,7 @@ export function Header({
             active={activeView === 'cut'}
             onClick={() => setActiveView('cut')}
           >
-            Cut & prep
+            Cut & prep ✂
           </ViewButton>
         </div>
 
