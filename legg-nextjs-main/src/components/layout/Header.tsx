@@ -112,7 +112,7 @@ export function Header({
             active={activeView === 'fab'}
             onClick={() => setActiveView('fab')}
           >
-            Fab
+            Fab 🔨
           </ViewButton>
           <ViewButton
             active={activeView === 'cut'}
