@@ -195,6 +195,14 @@ function DayNote({ dayId }: DayNoteProps) {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startedEditingRef = useRef(false);
   const isMountedRef = useRef(true);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const adjustHeight = useCallback(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto';
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
+  }, []);
 
   // Dynamically scale font size: shorter notes appear larger to fill the space.
   const fontSize =
@@ -219,6 +227,7 @@ function DayNote({ dayId }: DayNoteProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const updated = e.target.value.toUpperCase();
     setDayNote(dayId, updated);
+    adjustHeight();
 
     // If the note is cleared out, persist the removal immediately since the field hides.
     if (updated.trim().length === 0) {
@@ -256,6 +265,7 @@ function DayNote({ dayId }: DayNoteProps) {
 
   useEffect(() => {
     isMountedRef.current = true;
+    adjustHeight();
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -267,7 +277,11 @@ function DayNote({ dayId }: DayNoteProps) {
         startedEditingRef.current = false;
       }
     };
-  }, [stopEditing]);
+  }, [stopEditing, adjustHeight]);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [note, adjustHeight]);
 
   return (
     <div
@@ -277,8 +291,9 @@ function DayNote({ dayId }: DayNoteProps) {
       )}
     >
       <textarea
+        ref={textAreaRef}
         className={clsx(
-          'w-full h-16 resize-none rounded-lg p-2 text-center',
+          'w-full min-h-16 resize-none rounded-lg p-2 text-center',
           'bg-bg-softer/50 border border-white/5',
           'text-gold-border text-xs placeholder:text-text-muted/30',
           'focus:outline-none focus:border-accent/50'
