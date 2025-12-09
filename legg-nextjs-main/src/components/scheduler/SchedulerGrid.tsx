@@ -6,16 +6,22 @@ import { DayColumn } from './DayColumn';
 import { startOfToday, getPreviousFriday, toISODateString, startOfThisWeekMonday } from '@/lib/utils/dates';
 import { useJobStore } from '@/stores/jobStore';
 import { useUIStore } from '@/stores/uiStore';
-import type { Day, ScheduleByDay } from '@/types';
+import type { Day, ScheduleByDay, AppSettings, ViewMode } from '@/types';
+
+type CapacityParams = AppSettings & {
+  dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
+  fridayLocks: Record<string, boolean>;
+};
 
 interface SchedulerGridProps {
   days: Day[];
   scheduleByDay: ScheduleByDay;
   isFullScreen?: boolean;
   startMonday: Date;
+  params: CapacityParams;
 }
 
-export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday }: SchedulerGridProps) {
+export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, params }: SchedulerGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const jobs = useJobStore((state) => state.jobs);
   const activeView = useUIStore((state) => state.activeView);
@@ -134,6 +140,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday }
             segments={scheduleByDay[day.id] || []}
             isFullScreen={isFullScreen}
             extraFractions={extraFractionsByDay[day.id]}
+            params={params}
           />
         ))}
       </div>

@@ -184,6 +184,9 @@ export function SettingsModal() {
               Import JSON
             </Button>
           </div>
+          <p className="text-[11px] text-text-muted">
+            Files are stored at <span className="font-semibold">J:\Scheduler Backup files</span>
+          </p>
         </div>
       </div>
 

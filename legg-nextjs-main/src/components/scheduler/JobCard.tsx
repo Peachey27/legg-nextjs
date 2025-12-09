@@ -50,7 +50,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
     });
   };
 
-  const showCenterLabel = hours >= 3;
+  const showCenterLabel = isCutView ? hours > 2 : hours > 3;
 
   return (
     <div
@@ -73,7 +73,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
     >
       {/* Large center title label (hidden for short segments < 3h) */}
       {showCenterLabel && (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none z-20">
           <div
             className="text-3xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words"
             style={{
@@ -127,7 +127,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       {/* Extra hours overlay (striped only for the extra portion) */}
       {extraFraction > 0 && (
         <div
-          className="absolute left-0 right-0 bottom-0 pointer-events-none"
+          className="absolute left-0 right-0 bottom-0 pointer-events-none z-10"
           style={{
             height: `${Math.min(100, extraFraction * 100)}%`,
             backgroundImage:

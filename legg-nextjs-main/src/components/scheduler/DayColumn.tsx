@@ -9,37 +9,31 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useJobStore } from '@/stores/jobStore';
 import { getDayCapacity, isFridayLocked } from '@/lib/utils/capacity';
 import { startOfToday, isSameDayISO, getCurrentTimeLinePosition } from '@/lib/utils/dates';
-import type { Day, JobSegment } from '@/types';
+import type { AppSettings, Day, JobSegment, ViewMode } from '@/types';
+
+type CapacityParams = AppSettings & {
+  dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
+  fridayLocks: Record<string, boolean>;
+};
 
 interface DayColumnProps {
   day: Day;
   segments: JobSegment[];
   isFullScreen?: boolean;
   extraFractions?: Record<string, number>;
+  params: CapacityParams;
 }
 
-export function DayColumn({ day, segments, isFullScreen, extraFractions }: DayColumnProps) {
+export function DayColumn({ day, segments, isFullScreen, extraFractions, params }: DayColumnProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { handleDropToDay, handleDragOver } = useDragDrop();
   const { openCapEdit, activeView } = useUIStore();
   const settings = useSettingsStore();
   const jobs = useJobStore((state) => state.jobs);
 
-  const params = {
-    monThuCapacity: settings.monThuCapacity,
-    friUnlockedCapacity: settings.friUnlockedCapacity,
-    friLockedCapacity: settings.friLockedCapacity,
-    includeSaturday: settings.includeSaturday,
-    saturdayCapacity: settings.saturdayCapacity,
-    cutMonThuCapacity: settings.cutMonThuCapacity,
-    cutFriCapacity: settings.cutFriCapacity,
-    dayCapacityOverrides: settings.dayCapacityOverrides,
-    fridayLocks: settings.fridayLocks,
-  };
-
   const capacity = getDayCapacity(day, params, activeView);
   const usedHours = segments.reduce((sum, seg) => sum + seg.hours, 0);
-  const isLocked = day.isFriday && isFridayLocked(day, settings.fridayLocks);
+  const isLocked = day.isFriday && isFridayLocked(day, params.fridayLocks);
 
   const isToday = isSameDayISO(day.id, startOfToday());
   const timeLinePosition = isToday ? getCurrentTimeLinePosition() : null;

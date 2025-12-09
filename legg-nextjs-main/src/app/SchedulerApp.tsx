@@ -26,7 +26,7 @@ export default function SchedulerApp() {
   const isFullScreen = useUIStore((state) => state.isFullScreen);
   const isEditing = useUIStore((state) => state.isEditing);
 
-  const { days, schedule, backlogJobs } = useSchedule(startMonday);
+  const { days, schedule, backlogJobs, params } = useSchedule(startMonday);
 
   // Hydration and initial data fetch
   useEffect(() => {
@@ -104,6 +104,7 @@ export default function SchedulerApp() {
           scheduleByDay={schedule.scheduleByDay}
           isFullScreen={isFullScreen}
           startMonday={startMonday}
+          params={params}
         />
 
         {/* Notes Panel (fullscreen only) */}
