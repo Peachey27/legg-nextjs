@@ -6,6 +6,8 @@ import { useUIStore } from '@/stores/uiStore';
 import { VQPill } from '@/components/ui';
 import type { Job } from '@/types';
 
+const BLACK_CARD_TEXT_COLOR = '#ffd60a';
+
 interface JobCardProps {
   job: Job;
   hours: number;
@@ -61,6 +63,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       )}
       style={{
         backgroundColor: job.color,
+        color: isBlackCard ? BLACK_CARD_TEXT_COLOR : undefined,
         flex: `${hours} 0 auto`,
         minHeight: '40px',
       }}
@@ -73,7 +76,12 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] pointer-events-none">
           <div
             className="text-3xl font-black uppercase text-center px-3 py-2 rounded-lg bg-black/35 text-bg shadow-card leading-tight break-words"
-            style={{ wordBreak: 'keep-all', overflowWrap: 'normal', whiteSpace: 'normal' }}
+            style={{
+              wordBreak: 'keep-all',
+              overflowWrap: 'normal',
+              whiteSpace: 'normal',
+              color: isBlackCard ? BLACK_CARD_TEXT_COLOR : undefined,
+            }}
           >
             {job.type === 'screens' && job.note ? job.note : job.title}
           </div>
@@ -90,7 +98,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
         {job.vquote && <VQPill vquote={job.vquote} />}
         <span
           className={clsx(isPartial && 'text-yellow-600')}
-          style={{ color: isBlackCard ? '#fff' : '#000' }}
+          style={{ color: isBlackCard ? BLACK_CARD_TEXT_COLOR : '#000' }}
         >
           {isPartial ? `${hours.toFixed(1)}/${combinedHours}h` : `${combinedHours}h`}
         </span>
@@ -108,7 +116,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
             isFullScreen && 'text-2xl font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] uppercase'
           )}
           style={{
-            color: '#ff3b6b',
+            color: isBlackCard ? BLACK_CARD_TEXT_COLOR : '#ff3b6b',
             textTransform: isFullScreen ? 'uppercase' : undefined,
           }}
         >
@@ -176,7 +184,10 @@ export function BacklogJob({ job }: BacklogJobProps) {
         'border border-white/20 shadow-card',
         'text-bg relative'
       )}
-      style={{ backgroundColor: job.color }}
+      style={{
+        backgroundColor: job.color,
+        color: isBlackCard ? BLACK_CARD_TEXT_COLOR : undefined,
+      }}
       draggable
       onDragStart={(e) => handleDragStart(e, job.id)}
       onDoubleClick={() => openEditJob(job.id)}
@@ -186,7 +197,7 @@ export function BacklogJob({ job }: BacklogJobProps) {
       </div>
       <div className="flex items-center gap-1 text-[10px] mt-0.5">
         {job.vquote && <VQPill vquote={job.vquote} />}
-        <span style={{ color: isBlackCard ? '#fff' : '#000' }}>{hours}h</span>
+        <span style={{ color: isBlackCard ? BLACK_CARD_TEXT_COLOR : '#000' }}>{hours}h</span>
         {job.type === 'screens' && (
           <span className="bg-job-lime/30 px-1 rounded text-job-lime">screens</span>
         )}
