@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SchedulerGrid } from '@/components/scheduler/SchedulerGrid';
+import { MobileFinder } from '@/components/scheduler/MobileFinder';
 import { NotesPanel } from '@/components/scheduler/NotesPanel';
 import { EditJobModal } from '@/components/modals/EditJobModal';
 import { SettingsModal } from '@/components/modals/SettingsModal';
@@ -111,6 +112,9 @@ export default function SchedulerApp() {
         {isFullScreen && (
           <NotesPanel days={days} scheduleByDay={schedule.scheduleByDay} />
         )}
+
+        {/* Mobile job finder (visible only on small screens) */}
+        <MobileFinder days={days} scheduleByDay={schedule.scheduleByDay} />
       </div>
 
       {/* Modals */}
