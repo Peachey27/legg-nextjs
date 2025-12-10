@@ -59,8 +59,8 @@ export function DayColumn({ day, segments, isFullScreen, extraFractions, params 
       className={clsx(
         'flex-shrink-0 flex flex-col rounded-xl overflow-hidden',
         'bg-day-column-gradient shadow-card-lg border border-white/[0.03]',
-        isFullScreen ? 'w-75' : 'w-65',
-        'mr-2.5'
+        isFullScreen ? 'sm:w-75 w-64' : 'sm:w-65 w-52',
+        'sm:mr-2.5 mr-2'
       )}
       data-day-id={day.id}
     >
