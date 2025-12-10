@@ -128,6 +128,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
       className={clsx(
         'flex-1 overflow-x-auto overflow-y-hidden',
         'sm:px-2 px-1 sm:py-3 py-2',
+        'max-sm:scale-[0.9] max-sm:origin-top-left',
         'scrollbar-custom'
       )}
       onDragOver={handleAutoScrollDragOver}
