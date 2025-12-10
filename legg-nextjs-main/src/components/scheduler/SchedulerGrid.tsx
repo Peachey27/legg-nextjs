@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, type RefObject } from 'react';
 import { DayColumn } from './DayColumn';
 import { startOfToday, getPreviousFriday, toISODateString, startOfThisWeekMonday } from '@/lib/utils/dates';
 import { useJobStore } from '@/stores/jobStore';
@@ -19,10 +19,10 @@ interface SchedulerGridProps {
   isFullScreen?: boolean;
   startMonday: Date;
   params: CapacityParams;
+  scrollRef: RefObject<HTMLDivElement>;
 }
 
-export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, params }: SchedulerGridProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, params, scrollRef }: SchedulerGridProps) {
   const jobs = useJobStore((state) => state.jobs);
   const activeView = useUIStore((state) => state.activeView);
   const handleAutoScrollDragOver = useCallback((e: React.DragEvent) => {

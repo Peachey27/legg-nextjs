@@ -7,9 +7,10 @@ import type { Day, ScheduleByDay } from '@/types';
 interface MobileFinderProps {
   days: Day[];
   scheduleByDay: ScheduleByDay;
+  onSelectDay: (dayId: string) => void;
 }
 
-export function MobileFinder({ days, scheduleByDay }: MobileFinderProps) {
+export function MobileFinder({ days, scheduleByDay, onSelectDay }: MobileFinderProps) {
   const jobs = useJobStore((state) => state.jobs);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -25,7 +26,7 @@ export function MobileFinder({ days, scheduleByDay }: MobileFinderProps) {
   const scheduledByJob = useMemo(() => {
     const lookup: Record<
       string,
-      { jobId: string; dayLabel: string; color: string; title: string; vquote: string }
+      { jobId: string; dayId: string; dayLabel: string; color: string; title: string; vquote: string }
     > = {};
 
     days.forEach((day) => {
@@ -36,6 +37,7 @@ export function MobileFinder({ days, scheduleByDay }: MobileFinderProps) {
         if (!job) return;
         lookup[seg.jobId] = {
           jobId: job.id,
+          dayId: day.id,
           dayLabel: dayLabelMap[day.id],
           color: job.color,
           title: job.title,
@@ -95,8 +97,13 @@ export function MobileFinder({ days, scheduleByDay }: MobileFinderProps) {
             {finderResults.map((entry) => (
               <div
                 key={entry.jobId}
-                className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text"
+                className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text cursor-pointer"
                 style={{ borderLeft: `6px solid ${entry.color}` }}
+                onClick={() => {
+                  onSelectDay(entry.dayId);
+                  setOpen(false);
+                  setQuery('');
+                }}
               >
                 <div className="font-semibold">{entry.title.toUpperCase()}</div>
                 <div className="text-text-muted">VQ {entry.vquote}</div>

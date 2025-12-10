@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -20,6 +20,7 @@ export default function SchedulerApp() {
   const [startMonday, setStartMonday] = useState(() => startOfThisWeekMonday());
   const [isHydrated, setIsHydrated] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const fetchJobs = useJobStore((state) => state.fetchJobs);
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
@@ -61,6 +62,15 @@ export default function SchedulerApp() {
 
   const handleNextWeek = () => {
     setStartMonday((prev) => addDays(prev, 7));
+  };
+
+  const handleSelectDay = (dayId: string) => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const target = container.querySelector(`[data-day-id="${dayId}"]`) as HTMLElement | null;
+    if (!target) return;
+    const left = target.offsetLeft - 12;
+    container.scrollTo({ left: Math.max(left, 0), behavior: 'smooth' });
   };
 
   // Prevent SSR flash
@@ -106,6 +116,7 @@ export default function SchedulerApp() {
           isFullScreen={isFullScreen}
           startMonday={startMonday}
           params={params}
+          scrollRef={scrollRef}
         />
 
         {/* Notes Panel (fullscreen only) */}
@@ -114,7 +125,11 @@ export default function SchedulerApp() {
         )}
 
         {/* Mobile job finder (visible only on small screens) */}
-        <MobileFinder days={days} scheduleByDay={schedule.scheduleByDay} />
+        <MobileFinder
+          days={days}
+          scheduleByDay={schedule.scheduleByDay}
+          onSelectDay={handleSelectDay}
+        />
       </div>
 
       {/* Modals */}
