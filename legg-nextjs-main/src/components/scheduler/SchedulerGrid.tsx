@@ -178,26 +178,27 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
       )}
       onDragOver={handleAutoScrollDragOver}
     >
-      <div className="sm:hidden px-1 pb-2">
+      {/* Mobile floating finder */}
+      <div className="sm:hidden fixed right-3 top-20 z-30 w-[42%] max-w-xs">
         {!showFinder ? (
           <button
-            className="w-full rounded-lg bg-bg-soft border border-white/10 px-3 py-2 text-xs font-semibold text-text"
+            className="w-full rounded-full bg-accent text-bg px-3 py-2 text-xs font-semibold shadow-lg"
             onClick={() => setShowFinder(true)}
           >
-            Find Job
+            Find Job / VQ
           </button>
         ) : (
-          <div className="bg-bg-soft/90 border border-white/10 rounded-lg p-2 space-y-2">
+          <div className="bg-bg-softer/95 border border-white/10 rounded-xl p-3 space-y-2 shadow-xl">
             <div className="flex gap-2">
               <input
-                className="flex-1 rounded border border-border bg-bg-softer px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
+                className="flex-1 rounded-lg border border-border bg-bg px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
                 placeholder="Search title or VQuote"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 autoFocus
               />
               <button
-                className="rounded bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
+                className="rounded-lg bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
                 onClick={() => {
                   setShowFinder(false);
                   setQuery('');
@@ -207,7 +208,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
               </button>
             </div>
 
-            <div className="max-h-48 overflow-y-auto space-y-1">
+            <div className="max-h-52 overflow-y-auto space-y-1">
               {query.trim().length === 0 && (
                 <div className="text-[11px] text-text-muted">Type to find a job...</div>
               )}
@@ -217,7 +218,7 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
               {finderResults.map((entry) => (
                 <div
                   key={entry.job.id}
-                  className="rounded-lg border border-white/10 bg-bg-softer px-2 py-1 text-[11px] text-text"
+                  className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text"
                   style={{ borderLeft: `6px solid ${entry.job.color}` }}
                 >
                   <div className="font-semibold">{entry.job.title.toUpperCase()}</div>
