@@ -78,3 +78,10 @@
     width: 14rem !important;
   }
 }
+
+/* Hide the notes rail on phone fullscreen (too large / not needed) */
+@media (max-width: 768px) {
+  .mobile-hide-notes {
+    display: none !important;
+  }
+}

@@ -68,7 +68,8 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
         isFullScreen ? 'w-95' : 'w-75',
         'bg-notes-panel-gradient',
         'border-l border-white/5',
-        'p-4'
+        'p-4',
+        'mobile-hide-notes'
       )}
     >
       <div className="text-sm font-semibold text-text mb-1">Notes in schedule</div>
