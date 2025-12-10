@@ -1,12 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { DayColumn } from './DayColumn';
 import { startOfToday, getPreviousFriday, toISODateString, startOfThisWeekMonday } from '@/lib/utils/dates';
 import { useJobStore } from '@/stores/jobStore';
 import { useUIStore } from '@/stores/uiStore';
-import type { Day, ScheduleByDay, AppSettings, ViewMode } from '@/types';
+import type { Day, ScheduleByDay, AppSettings, ViewMode, Job } from '@/types';
 
 type CapacityParams = AppSettings & {
   dayCapacityOverrides: Record<string, Partial<Record<ViewMode, number>>>;
@@ -25,6 +25,8 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
   const scrollRef = useRef<HTMLDivElement>(null);
   const jobs = useJobStore((state) => state.jobs);
   const activeView = useUIStore((state) => state.activeView);
+  const [showFinder, setShowFinder] = useState(false);
+  const [query, setQuery] = useState('');
   const handleAutoScrollDragOver = useCallback((e: React.DragEvent) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -71,6 +73,48 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
 
     return map;
   }, [activeView, days, jobs, scheduleByDay]);
+
+  const dayLabelMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    days.forEach((d) => {
+      m[d.id] = d.label;
+    });
+    return m;
+  }, [days]);
+
+  const scheduledByJob = useMemo(() => {
+    const lookup: Record<
+      string,
+      { job: Job; dayId: string; dayLabel: string; hours: number }
+    > = {};
+
+    days.forEach((day) => {
+      const segments = scheduleByDay[day.id] || [];
+      segments.forEach((seg) => {
+        if (lookup[seg.jobId]) return;
+        const job = jobs.find((j) => j.id === seg.jobId);
+        if (!job) return;
+        lookup[seg.jobId] = {
+          job,
+          dayId: day.id,
+          dayLabel: dayLabelMap[day.id],
+          hours: seg.hours,
+        };
+      });
+    });
+
+    return lookup;
+  }, [days, scheduleByDay, jobs, dayLabelMap]);
+
+  const finderResults = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    if (!term) return [];
+    return Object.values(scheduledByJob).filter(({ job }) => {
+      const title = job.title?.toLowerCase() || '';
+      const vq = job.vquote?.toLowerCase() || '';
+      return title.includes(term) || vq.includes(term);
+    });
+  }, [query, scheduledByJob]);
 
   const today = startOfToday();
   const todayId = toISODateString(today);
@@ -134,6 +178,58 @@ export function SchedulerGrid({ days, scheduleByDay, isFullScreen, startMonday, 
       )}
       onDragOver={handleAutoScrollDragOver}
     >
+      <div className="sm:hidden px-1 pb-2">
+        {!showFinder ? (
+          <button
+            className="w-full rounded-lg bg-bg-soft border border-white/10 px-3 py-2 text-xs font-semibold text-text"
+            onClick={() => setShowFinder(true)}
+          >
+            Find Job
+          </button>
+        ) : (
+          <div className="bg-bg-soft/90 border border-white/10 rounded-lg p-2 space-y-2">
+            <div className="flex gap-2">
+              <input
+                className="flex-1 rounded border border-border bg-bg-softer px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
+                placeholder="Search title or VQuote"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoFocus
+              />
+              <button
+                className="rounded bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
+                onClick={() => {
+                  setShowFinder(false);
+                  setQuery('');
+                }}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {query.trim().length === 0 && (
+                <div className="text-[11px] text-text-muted">Type to find a job...</div>
+              )}
+              {query.trim().length > 0 && finderResults.length === 0 && (
+                <div className="text-[11px] text-text-muted">No matches in the active view.</div>
+              )}
+              {finderResults.map((entry) => (
+                <div
+                  key={entry.job.id}
+                  className="rounded-lg border border-white/10 bg-bg-softer px-2 py-1 text-[11px] text-text"
+                  style={{ borderLeft: `6px solid ${entry.job.color}` }}
+                >
+                  <div className="font-semibold">{entry.job.title.toUpperCase()}</div>
+                  <div className="text-text-muted">VQ {entry.job.vquote}</div>
+                  <div className="text-accent">{entry.dayLabel}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="flex h-full">
         {days.map((day) => (
           <DayColumn
