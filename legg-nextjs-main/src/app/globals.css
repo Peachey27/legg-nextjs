@@ -61,3 +61,20 @@
     rgba(255, 255, 255, 0.02) 16px
   ), rgba(0, 0, 0, 0.25);
 }
+
+/* Mobile landscape tweaks: zoom out and tighten columns */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-landscape-zoom {
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+
+  .day-column {
+    width: 10rem !important;
+    margin-right: 0.35rem !important;
+  }
+
+  .day-column.day-column-full {
+    width: 14rem !important;
+  }
+}
