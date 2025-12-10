@@ -21,6 +21,7 @@ export default function SchedulerApp() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isFinderOpen, setIsFinderOpen] = useState(false);
 
   const fetchJobs = useJobStore((state) => state.fetchJobs);
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
@@ -71,6 +72,7 @@ export default function SchedulerApp() {
     if (!target) return;
     const left = target.offsetLeft - 12;
     container.scrollTo({ left: Math.max(left, 0), behavior: 'smooth' });
+    setIsFinderOpen(false);
   };
 
   // Prevent SSR flash
@@ -97,6 +99,7 @@ export default function SchedulerApp() {
         onNextWeek={handleNextWeek}
         onToggleSidebar={() => setIsSidebarOpen((v) => !v)}
         isSidebarOpen={isSidebarOpen}
+        onOpenFinder={() => setIsFinderOpen(true)}
       />
 
       {/* Main Content */}
@@ -129,6 +132,8 @@ export default function SchedulerApp() {
           days={days}
           scheduleByDay={schedule.scheduleByDay}
           onSelectDay={handleSelectDay}
+          open={isFinderOpen}
+          setOpen={setIsFinderOpen}
         />
       </div>
 

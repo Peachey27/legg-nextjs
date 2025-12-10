@@ -8,11 +8,12 @@ interface MobileFinderProps {
   days: Day[];
   scheduleByDay: ScheduleByDay;
   onSelectDay: (dayId: string) => void;
+  open: boolean;
+  setOpen: (val: boolean) => void;
 }
 
-export function MobileFinder({ days, scheduleByDay, onSelectDay }: MobileFinderProps) {
+export function MobileFinder({ days, scheduleByDay, onSelectDay, open, setOpen }: MobileFinderProps) {
   const jobs = useJobStore((state) => state.jobs);
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
   const dayLabelMap = useMemo(() => {
@@ -58,61 +59,113 @@ export function MobileFinder({ days, scheduleByDay, onSelectDay }: MobileFinderP
   }, [query, scheduledByJob]);
 
   return (
-    <div className="sm:hidden fixed right-3 top-24 z-40 w-[46%] max-w-xs">
-      {!open ? (
-        <button
-          className="w-full rounded-full bg-accent text-bg px-3 py-2 text-xs font-semibold shadow-lg"
-          onClick={() => setOpen(true)}
-        >
-          Find Job / VQ
-        </button>
-      ) : (
-        <div className="bg-bg-softer/95 border border-white/10 rounded-xl p-3 space-y-2 shadow-xl">
-          <div className="flex gap-2">
-            <input
-              className="flex-1 rounded-lg border border-border bg-bg px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
-              placeholder="Search title or VQuote"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              autoFocus
-            />
-            <button
-              className="rounded-lg bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
-              onClick={() => {
-                setOpen(false);
-                setQuery('');
-              }}
-            >
-              Close
-            </button>
-          </div>
-
-          <div className="max-h-52 overflow-y-auto space-y-1">
-            {query.trim().length === 0 && (
-              <div className="text-[11px] text-text-muted">Type to find a job...</div>
-            )}
-            {query.trim().length > 0 && finderResults.length === 0 && (
-              <div className="text-[11px] text-text-muted">No matches in the active view.</div>
-            )}
-            {finderResults.map((entry) => (
-              <div
-                key={entry.jobId}
-                className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text cursor-pointer"
-                style={{ borderLeft: `6px solid ${entry.color}` }}
+    <>
+      <div className="hidden sm:block fixed right-6 top-20 z-40 w-64">
+        {open && (
+          <div className="bg-bg-softer/95 border border-white/10 rounded-xl p-3 space-y-2 shadow-xl">
+            <div className="flex gap-2">
+              <input
+                className="flex-1 rounded-lg border border-border bg-bg px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
+                placeholder="Search title or VQuote"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoFocus
+              />
+              <button
+                className="rounded-lg bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
                 onClick={() => {
-                  onSelectDay(entry.dayId);
                   setOpen(false);
                   setQuery('');
                 }}
               >
-                <div className="font-semibold">{entry.title.toUpperCase()}</div>
-                <div className="text-text-muted">VQ {entry.vquote}</div>
-                <div className="text-accent">{entry.dayLabel}</div>
-              </div>
-            ))}
+                Close
+              </button>
+            </div>
+
+            <div className="max-h-52 overflow-y-auto space-y-1">
+              {query.trim().length === 0 && (
+                <div className="text-[11px] text-text-muted">Type to find a job...</div>
+              )}
+              {query.trim().length > 0 && finderResults.length === 0 && (
+                <div className="text-[11px] text-text-muted">No matches in the active view.</div>
+              )}
+              {finderResults.map((entry) => (
+                <div
+                  key={entry.jobId}
+                  className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text cursor-pointer"
+                  style={{ borderLeft: `6px solid ${entry.color}` }}
+                  onClick={() => {
+                    onSelectDay(entry.dayId);
+                    setOpen(false);
+                    setQuery('');
+                  }}
+                >
+                  <div className="font-semibold">{entry.title.toUpperCase()}</div>
+                  <div className="text-text-muted">VQ {entry.vquote}</div>
+                  <div className="text-accent">{entry.dayLabel}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      <div className="sm:hidden fixed right-3 top-24 z-40 w-[46%] max-w-xs">
+        {!open ? (
+          <button
+            className="w-full rounded-full bg-accent text-bg px-3 py-2 text-xs font-semibold shadow-lg"
+            onClick={() => setOpen(true)}
+          >
+            Find Job / VQ
+          </button>
+        ) : (
+          <div className="bg-bg-softer/95 border border-white/10 rounded-xl p-3 space-y-2 shadow-xl">
+            <div className="flex gap-2">
+              <input
+                className="flex-1 rounded-lg border border-border bg-bg px-2 py-1 text-xs text-text focus:outline-none focus:border-accent"
+                placeholder="Search title or VQuote"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoFocus
+              />
+              <button
+                className="rounded-lg bg-accent/80 text-bg px-2 py-1 text-[11px] font-semibold"
+                onClick={() => {
+                  setOpen(false);
+                  setQuery('');
+                }}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="max-h-52 overflow-y-auto space-y-1">
+              {query.trim().length === 0 && (
+                <div className="text-[11px] text-text-muted">Type to find a job...</div>
+              )}
+              {query.trim().length > 0 && finderResults.length === 0 && (
+                <div className="text-[11px] text-text-muted">No matches in the active view.</div>
+              )}
+              {finderResults.map((entry) => (
+                <div
+                  key={entry.jobId}
+                  className="rounded-lg border border-white/10 bg-bg px-2 py-1 text-[11px] text-text cursor-pointer"
+                  style={{ borderLeft: `6px solid ${entry.color}` }}
+                  onClick={() => {
+                    onSelectDay(entry.dayId);
+                    setOpen(false);
+                    setQuery('');
+                  }}
+                >
+                  <div className="font-semibold">{entry.title.toUpperCase()}</div>
+                  <div className="text-text-muted">VQ {entry.vquote}</div>
+                  <div className="text-accent">{entry.dayLabel}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

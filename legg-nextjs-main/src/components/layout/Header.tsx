@@ -16,6 +16,7 @@ interface HeaderProps {
   onNextWeek: () => void;
   onToggleSidebar: () => void;
   isSidebarOpen: boolean;
+  onOpenFinder: () => void;
 }
 
 export function Header({
@@ -25,6 +26,7 @@ export function Header({
   onNextWeek,
   onToggleSidebar,
   isSidebarOpen,
+  onOpenFinder,
 }: HeaderProps) {
   const { activeView, setActiveView, isFullScreen, toggleFullScreen, openSettings } = useUIStore();
   const settings = useSettingsStore();
@@ -106,6 +108,15 @@ export function Header({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2 flex-wrap">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="hidden sm:inline-flex"
+          onClick={onOpenFinder}
+        >
+          Find Job / VQ
+        </Button>
+
         {/* View Toggle */}
         <div className="flex rounded-pill border border-border overflow-hidden">
           <ViewButton
