@@ -37,6 +37,7 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
         if (!job) return;
         const note = job.note?.trim();
         if (!note) return;
+        if (isFullScreen && job.type === 'screens') return;
 
         const existing = firstByJob[job.id];
         if (!existing || idx < existing.dayIndex) {
@@ -59,7 +60,7 @@ export function NotesPanel({ days, scheduleByDay }: NotesPanelProps) {
         if (a.dayIndex !== b.dayIndex) return a.dayIndex - b.dayIndex;
         return a.order - b.order;
       });
-  }, [days, scheduleByDay, jobs]);
+  }, [days, scheduleByDay, jobs, isFullScreen]);
 
   return (
     <aside

@@ -52,6 +52,12 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
 
   const showCenterLabel = isCutView ? hours > 2 : hours > 3;
 
+  const centerLabel =
+    job.type === 'screens' && job.note
+      ? job.note
+      : job.title;
+  const showNotePreview = job.note && textSize !== 'tiny' && !(isFullScreen && job.type === 'screens');
+
   return (
     <div
       className={clsx(
@@ -83,7 +89,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
               color: isBlackCard ? BLACK_CARD_TEXT_COLOR : undefined,
             }}
           >
-            {job.type === 'screens' && job.note ? job.note : job.title}
+            {centerLabel}
           </div>
         </div>
       )}
@@ -108,7 +114,7 @@ export function JobCard({ job, hours, heightPercent = 100, isCutView, extraFract
       </div>
 
       {/* Note preview */}
-      {job.note && textSize !== 'tiny' && (
+      {showNotePreview && (
         <div
           className={clsx(
             'truncate',
